@@ -1,0 +1,20 @@
+{
+"name": "cas cadex",
+"version": "1.0.0",
+"description": "A developer tool for analyzing CSS conflicts, explaining cascade behavior, and detecting fragile styling patterns.",
+"private": true,
+"type": "module",
+"scripts": {
+"test": "node --test",
+"start": "node src/server.js",
+"dev": "node --watch src/server.js"
+},
+"keywords": [
+"css",
+"css-analyzer",
+"css-specificity",
+"developer-tools"
+],
+"author": "Manoj Inturi",
+"license": "UNLICENSED"
+}
