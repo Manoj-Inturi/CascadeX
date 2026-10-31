@@ -1,0 +1,56 @@
+# Dependencies
+
+node_modules/
+
+# Environment variables and secrets
+
+.env
+.env.*
+!.env.example
+
+# Logs
+
+logs/
+*.log
+npm-debug.log*
+
+# Build output
+
+dist/
+build/
+coverage/
+
+# Temporary files
+
+tmp/
+temp/
+*.tmp
+
+# Operating system files
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor settings
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Test artifacts
+
+.nyc_output/
+
+# Local databases
+
+*.sqlite
+*.sqlite3
+*.db
+
+# Private keys and certificates
+
+*.pem
+*.key
+*.p12
+*.pfx
