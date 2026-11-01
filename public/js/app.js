@@ -23,3 +23,19 @@ themeButton.addEventListener("click", () => {
     localStorage.setItem("theme", newTheme);
     themeButton.textContent = newTheme === "dark" ? "Light mode" : "Dark mode";
 });
+
+// CSS editor
+const cssInput = document.getElementById("css-input");
+const characterCount = document.getElementById("character-count");
+const clearButton = document.getElementById("clear-css");
+
+// Update count
+cssInput.addEventListener("input", () => {
+    characterCount.textContent = `${cssInput.value.length} characters`;
+});
+
+// Clear editor
+clearButton.addEventListener("click", () => {
+    cssInput.value = "";
+    characterCount.textContent = "0 characters";
+});
