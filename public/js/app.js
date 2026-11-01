@@ -39,3 +39,30 @@ clearButton.addEventListener("click", () => {
     cssInput.value = "";
     characterCount.textContent = "0 characters";
 });
+// File upload
+const cssFile = document.getElementById("css-file");
+const fileName = document.getElementById("file-name");
+
+cssFile.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    if (!file.name.endsWith(".css")) {
+        alert("Please select a CSS file");
+        cssFile.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        cssInput.value = e.target.result;
+        characterCount.textContent = `${cssInput.value.length} characters`;
+        fileName.textContent = file.name;
+    };
+
+    reader.readAsText(file);
+});
