@@ -1,11 +1,12 @@
 // Find selectors
 function getSelectors(css) {
     const selectors = [];
+    const cleanCSS = css.replace(/\/\*[\s\S]*?\*\//g, "");
     const regex = /([^{}]+)\s*\{/g;
 
     let match;
 
-    while ((match = regex.exec(css)) !== null) {
+    while ((match = regex.exec(cleanCSS)) !== null) {
         const selector = match[1].trim();
 
         if (selector && !selector.startsWith("@")) {

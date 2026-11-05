@@ -72,6 +72,7 @@ cssFile.addEventListener("change", (event) => {
 });
 
 // Analyze CSS
+// Analyze CSS
 const analyzeButton = document.getElementById("analyze-css");
 const resultsPlaceholder = document.getElementById("results-placeholder");
 const resultsList = document.getElementById("results-list");
@@ -98,6 +99,17 @@ analyzeButton.addEventListener("click", () => {
 
     resultsPlaceholder.style.display = "none";
 
+    // Result heading
+    const heading = document.createElement("div");
+    heading.className = "result-header";
+    heading.innerHTML = `
+        <span>Selector</span>
+        <span>Specificity</span>
+        <span>Status</span>
+    `;
+
+    resultsList.appendChild(heading);
+
     // Show results
     selectors.forEach((selector) => {
         const item = document.createElement("div");
@@ -105,15 +117,23 @@ analyzeButton.addEventListener("click", () => {
         const score = document.createElement("span");
         const status = document.createElement("span");
 
+        const values = calculateSpecificity(selector)
+            .split(",")
+            .map(value => value.trim());
+
         item.className = "result-item";
 
         name.textContent = selector;
-        score.textContent = calculateSpecificity(selector);
+
+        score.textContent =
+            `${values[0]} IDs, ${values[1]} classes, ${values[2]} elements`;
 
         if (duplicates.includes(selector)) {
             status.textContent = "Duplicate";
+            status.className = "duplicate";
         } else {
             status.textContent = "Unique";
+            status.className = "unique";
         }
 
         item.appendChild(name);
