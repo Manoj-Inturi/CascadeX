@@ -1,4 +1,5 @@
 import { getSelectors } from "./analyzer.js";
+import { calculateSpecificity } from "./specificity.js";
 // Theme button
 const themeButton = document.getElementById("theme-toggle");
 
@@ -94,12 +95,20 @@ analyzeButton.addEventListener("click", () => {
 
     resultsPlaceholder.style.display = "none";
 
-    selectors.forEach((selector) => {
-        const item = document.createElement("div");
+    // Show results
+selectors.forEach((selector) => {
+    const item = document.createElement("div");
+    const name = document.createElement("span");
+    const score = document.createElement("span");
 
-        item.className = "result-item";
-        item.textContent = selector;
+    item.className = "result-item";
 
-        resultsList.appendChild(item);
-    });
+    name.textContent = selector;
+    score.textContent = calculateSpecificity(selector);
+
+    item.appendChild(name);
+    item.appendChild(score);
+
+    resultsList.appendChild(item);
+});
 });

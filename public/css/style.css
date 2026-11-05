@@ -473,3 +473,16 @@ label:focus-visible {
     font-family: Consolas, monospace;
     color: var(--text);
 }
+/* Result items */
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.result-item span:last-child {
+    color: var(--accent);
+    font-weight: 600;
+    font-family: Arial, sans-serif;
+}
