@@ -1,165 +1,155 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CascadeX - CSS Analyzer</title>
-    <link rel="stylesheet" href="./css/style.css">
-</head>
-<body>
-
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
     <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">CascadeX</div>
 
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">CascadeX</div>
+        <nav>
+          <a href="#dashboard" class="nav-link active">Dashboard</a>
+          <a href="#analyzer" class="nav-link">CSS Analyzer</a>
+          <a href="#results-section" class="nav-link">Results</a>
+          <a href="#history" class="nav-link">History</a>
+        </nav>
 
-            <nav>
-                <a href="#dashboard" class="nav-link active">Dashboard</a>
-                <a href="#analyzer" class="nav-link">CSS Analyzer</a>
-                <a href="#results-section" class="nav-link">Results</a>
-                <a href="#history" class="nav-link">History</a>
-            </nav>
+        <div class="sidebar-bottom">CSS Analysis Tool</div>
+      </aside>
 
-            <div class="sidebar-bottom">
-                CSS Analysis Tool
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="topbar">
+          <div>
+            <p class="breadcrumb">Dashboard / Overview</p>
+            <h1>Dashboard</h1>
+          </div>
+
+          <button id="theme-toggle" class="theme-button">Toggle Theme</button>
+        </header>
+
+        <!-- Welcome -->
+        <section class="welcome" id="dashboard">
+          <h2>Welcome to CascadeX</h2>
+          <p>
+            Analyze your CSS selectors, find duplicates and check specificity.
+          </p>
+        </section>
+
+        <!-- Summary -->
+        <section id="analysis-summary" class="stats" hidden>
+          <div class="stat-card">
+            <p>Total Selectors</p>
+            <h3 id="total-selectors">0</h3>
+          </div>
+
+          <div class="stat-card">
+            <p>Duplicate Selectors</p>
+            <h3 id="total-duplicates">0</h3>
+          </div>
+
+          <div class="stat-card">
+            <p>Unique Selectors</p>
+            <h3 id="total-unique">0</h3>
+          </div>
+        </section>
+
+        <!-- Analyzer -->
+        <section class="analyzer" id="analyzer">
+          <div class="section-heading">
+            <h2>CSS Analyzer</h2>
+            <p>Paste your CSS code below to analyze it.</p>
+          </div>
+
+          <div class="editor-card">
+            <div class="editor-header">
+              <label for="css-input">CSS Editor</label>
+              <span id="char-count">0 characters</span>
             </div>
-        </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
+            <textarea
+              id="css-input"
+              placeholder="Paste your CSS code here..."
+            ></textarea>
 
-            <!-- Header -->
-            <header class="topbar">
-                <div>
-                    <p class="breadcrumb">Dashboard / Overview</p>
-                    <h1>Dashboard</h1>
-                </div>
+            <div class="editor-footer">
+              <div class="file-actions">
+                <label for="css-file" class="file-button"> Upload CSS </label>
+                <input
+                  type="file"
+                  id="css-file"
+                  accept=".css,text/css"
+                  hidden
+                />
+                <span id="file-name">No file selected</span>
+              </div>
 
-                <button id="theme-toggle" class="theme-button">
-                    Toggle Theme
+              <div class="action-buttons">
+                <button id="clear-button" class="secondary-button">
+                  Clear
                 </button>
-            </header>
 
-            <!-- Welcome -->
-            <section class="welcome" id="dashboard">
-                <h2>Welcome to CascadeX</h2>
-                <p>Analyze your CSS selectors, find duplicates and check specificity.</p>
-            </section>
+                <button id="analyze-button" class="primary-button">
+                  Analyze CSS
+                </button>
 
-            <!-- Summary -->
-            <section id="analysis-summary" class="stats" hidden>
-                <div class="stat-card">
-                    <p>Total Selectors</p>
-                    <h3 id="total-selectors">0</h3>
-                </div>
+                <button id="export-report" class="secondary-button" disabled>
+                  Export Report
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                <div class="stat-card">
-                    <p>Duplicate Selectors</p>
-                    <h3 id="total-duplicates">0</h3>
-                </div>
+        <!-- Results -->
+        <section id="results-section" class="results-section" hidden>
+          <h2>Analysis Results</h2>
 
-                <div class="stat-card">
-                    <p>Unique Selectors</p>
-                    <h3 id="total-unique">0</h3>
-                </div>
-            </section>
+          <div id="results-placeholder" class="results-placeholder" hidden>
+            <h3>No Results Yet</h3>
+            <p>Analyze your CSS to see the results here.</p>
+          </div>
 
-            <!-- Analyzer -->
-            <section class="analyzer" id="analyzer">
+          <div id="results-list">
+            <div class="result-header">
+              <span>Selector</span>
+              <span>Specificity</span>
+              <span>Status</span>
+            </div>
+          </div>
+        </section>
 
-                <div class="section-heading">
-                    <h2>CSS Analyzer</h2>
-                    <p>Paste your CSS code below to analyze it.</p>
-                </div>
+        <!-- History -->
+        <section id="history" class="history-section">
+          <div class="history-heading">
+            <div>
+              <h2>Analysis History</h2>
+              <p>View your previous CSS analyses.</p>
+            </div>
 
-                <div class="editor-card">
+            <button id="clear-history" class="secondary-button">
+              Clear History
+            </button>
+          </div>
 
-                    <div class="editor-header">
-                        <label for="css-input">CSS Editor</label>
-                        <span id="char-count">0 characters</span>
-                    </div>
+          <div id="history-list">
+            <p class="history-empty">No analysis history yet.</p>
+          </div>
+        </section>
 
-                    <textarea
-                        id="css-input"
-                        placeholder="Paste your CSS code here..."
-                    ></textarea>
-
-                    <div class="editor-footer">
-                        <div class="file-actions">
-                            <span id="file-name"></span>
-                        </div>
-
-                        <div class="action-buttons">
-                            <button id="clear-button" class="secondary-button">
-                                Clear
-                            </button>
-
-                            <button id="analyze-button" class="primary-button">
-                                Analyze CSS
-                            </button>
-
-                            <button id="export-report" class="secondary-button" disabled>
-                                Export Report
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <!-- Results -->
-            <section id="results-section" class="results-section" hidden>
-
-                <h2>Analysis Results</h2>
-
-                <div id="results-placeholder" class="results-placeholder" hidden>
-                    <h3>No Results Yet</h3>
-                    <p>Analyze your CSS to see the results here.</p>
-                </div>
-
-                <div id="results-list">
-
-                    <div class="result-header">
-                        <span>Selector</span>
-                        <span>Specificity</span>
-                        <span>Status</span>
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- History -->
-            <section id="history" class="history-section">
-
-                <div class="history-heading">
-                    <div>
-                        <h2>Analysis History</h2>
-                        <p>View your previous CSS analyses.</p>
-                    </div>
-
-                    <button id="clear-history" class="secondary-button">
-                        Clear History
-                    </button>
-                </div>
-
-                <div id="history-list">
-                    <p class="history-empty">No analysis history yet.</p>
-                </div>
-
-            </section>
-
-            <!-- Footer -->
-            <footer class="footer">
-                <p>© 2026 CascadeX. CSS Analysis Tool.</p>
-            </footer>
-
-        </main>
+        <!-- Footer -->
+        <footer class="footer">
+          <p>© 2026 CascadeX. CSS Analysis Tool.</p>
+        </footer>
+      </main>
     </div>
 
     <script type="module" src="./js/app.js"></script>
-
-</body>
+  </body>
 </html>
