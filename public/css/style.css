@@ -543,3 +543,37 @@ label:focus-visible {
         padding: 14px;
     }
 }
+
+/* History */
+.history-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.history-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 10px;
+}
+
+.history-item p:first-child {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.history-item p:last-child,
+.history-empty {
+    color: var(--text-light);
+}
+
+@media (max-width: 650px) {
+    .history-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

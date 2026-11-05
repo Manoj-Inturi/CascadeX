@@ -80,12 +80,73 @@ cssFile.addEventListener("change", (event) => {
     reader.readAsText(file);
 });
 
-// Analyze CSS
+// Analysis elements
 const analyzeButton = document.getElementById("analyze-css");
 const resultsPlaceholder = document.getElementById("results-placeholder");
 const resultsList = document.getElementById("results-list");
 const analysisSummary = document.getElementById("analysis-summary");
 
+// History elements
+const historyList = document.getElementById("history-list");
+const clearHistoryButton = document.getElementById("clear-history");
+
+// Load history
+function loadHistory() {
+    const history = JSON.parse(localStorage.getItem("analysisHistory")) || [];
+
+    historyList.innerHTML = "";
+
+    if (history.length === 0) {
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "history-empty";
+        emptyMessage.textContent = "No analysis history yet.";
+        historyList.appendChild(emptyMessage);
+        return;
+    }
+
+    history.forEach((entry) => {
+        const item = document.createElement("div");
+        const date = document.createElement("p");
+        const details = document.createElement("p");
+
+        item.className = "history-item";
+
+        date.textContent = entry.date;
+        details.textContent =
+            `${entry.total} selectors, ${entry.duplicates} duplicates`;
+
+        item.appendChild(date);
+        item.appendChild(details);
+
+        historyList.appendChild(item);
+    });
+}
+
+// Save history
+function saveHistory(total, duplicates) {
+    const history = JSON.parse(localStorage.getItem("analysisHistory")) || [];
+
+    history.unshift({
+        date: new Date().toLocaleString(),
+        total: total,
+        duplicates: duplicates
+    });
+
+    localStorage.setItem(
+        "analysisHistory",
+        JSON.stringify(history.slice(0, 10))
+    );
+
+    loadHistory();
+}
+
+// Clear history
+clearHistoryButton.addEventListener("click", () => {
+    localStorage.removeItem("analysisHistory");
+    loadHistory();
+});
+
+// Analyze CSS
 analyzeButton.addEventListener("click", () => {
     const css = cssInput.value.trim();
 
@@ -119,9 +180,11 @@ analyzeButton.addEventListener("click", () => {
     document.getElementById("total-duplicates").textContent = duplicateCount;
     document.getElementById("total-unique").textContent = uniqueCount;
 
+    // Save history
+    saveHistory(selectors.length, duplicateCount);
+
     // Result heading
     const heading = document.createElement("div");
-
     heading.className = "result-header";
 
     const selectorHeading = document.createElement("span");
@@ -171,3 +234,6 @@ analyzeButton.addEventListener("click", () => {
         resultsList.appendChild(item);
     });
 });
+
+// Show saved history
+loadHistory();
