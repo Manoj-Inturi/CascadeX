@@ -577,3 +577,25 @@ label:focus-visible {
         flex-direction: column;
     }
 }
+/* Warnings */
+.warnings-section {
+    margin-top: 20px;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.warnings-section h3 {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.warnings-section ul {
+    padding-left: 20px;
+    color: var(--warning);
+}
+
+.warnings-section li {
+    margin-bottom: 6px;
+}

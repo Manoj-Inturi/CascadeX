@@ -1,5 +1,10 @@
 
-import { getSelectors, getDuplicateSelectors } from "./analyzer.js";
+import {
+    getSelectors,
+    getDuplicateSelectors,
+    getCSSWarnings
+} from "./analyzer.js";
+
 import { calculateSpecificity } from "./specificity.js";
 
 // Get elements
@@ -14,6 +19,8 @@ const analysisSummary = document.getElementById("analysis-summary");
 const exportButton = document.getElementById("export-report");
 const cssFile = document.getElementById("css-file");
 const fileName = document.getElementById("file-name");
+const warningsSection = document.getElementById("warnings-section");
+const warningsList = document.getElementById("warnings-list");
 
 let latestReport = [];
 
@@ -40,12 +47,54 @@ themeToggle.addEventListener("click", () => {
 // Character counter
 cssInput.addEventListener("input", () => {
     charCount.textContent = `${cssInput.value.length} characters`;
+
+    latestReport = [];
+    exportButton.disabled = true;
 });
 
 // Clear editor
 clearButton.addEventListener("click", () => {
     cssInput.value = "";
     charCount.textContent = "0 characters";
+    fileName.textContent = "No file selected";
+
+    latestReport = [];
+    exportButton.disabled = true;
+
+    cssFile.value = "";
+    warningsSection.hidden = true;
+    resultsSection.hidden = true;
+    analysisSummary.hidden = true;
+});
+
+// Upload CSS file
+cssFile.addEventListener("change", () => {
+    const file = cssFile.files[0];
+
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".css")) {
+        alert("Please select a CSS file.");
+        cssFile.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+        cssInput.value = reader.result;
+        charCount.textContent = `${cssInput.value.length} characters`;
+        fileName.textContent = file.name;
+
+        latestReport = [];
+        exportButton.disabled = true;
+    };
+
+    reader.onerror = () => {
+        alert("Unable to read this file.");
+    };
+
+    reader.readAsText(file);
 });
 
 // Analyze CSS
@@ -59,15 +108,35 @@ analyzeButton.addEventListener("click", () => {
 
     const selectors = getSelectors(css);
     const duplicateSelectors = getDuplicateSelectors(css);
+    const warnings = getCSSWarnings(css);
 
-    resultsList.innerHTML = "";
+    resultsList.innerHTML = `
+        <div class="result-header">
+            <span>Selector</span>
+            <span>Specificity</span>
+            <span>Status</span>
+        </div>
+    `;
+
+    warningsList.innerHTML = "";
     latestReport = [];
+
+    // Display CSS warnings
+    warningsSection.hidden = warnings.length === 0;
+
+    warnings.forEach((warning) => {
+        const item = document.createElement("li");
+        item.textContent = warning;
+        warningsList.appendChild(item);
+    });
 
     if (selectors.length === 0) {
         alert("No CSS selectors found.");
+
         resultsSection.hidden = true;
         analysisSummary.hidden = true;
         exportButton.disabled = true;
+
         return;
     }
 
@@ -75,7 +144,10 @@ analyzeButton.addEventListener("click", () => {
 
     // Update summary
     document.getElementById("total-selectors").textContent = selectors.length;
-    document.getElementById("total-duplicates").textContent = duplicateSet.size;
+
+    document.getElementById("total-duplicates").textContent =
+        duplicateSet.size;
+
     document.getElementById("total-unique").textContent =
         new Set(selectors).size - duplicateSet.size;
 
@@ -148,7 +220,9 @@ Status: ${item.status}`;
 
 // Save history
 function saveHistory(css, total, duplicates) {
-    const history = JSON.parse(localStorage.getItem("analysisHistory")) || [];
+    const history = JSON.parse(
+        localStorage.getItem("analysisHistory")
+    ) || [];
 
     history.unshift({
         date: new Date().toLocaleString(),
@@ -168,13 +242,17 @@ function saveHistory(css, total, duplicates) {
 // Load history
 function loadHistory() {
     const historyList = document.getElementById("history-list");
-    const history = JSON.parse(localStorage.getItem("analysisHistory")) || [];
+
+    const history = JSON.parse(
+        localStorage.getItem("analysisHistory")
+    ) || [];
 
     historyList.innerHTML = "";
 
     if (history.length === 0) {
         historyList.innerHTML =
             '<p class="history-empty">No analysis history yet.</p>';
+
         return;
     }
 
@@ -196,6 +274,8 @@ function loadHistory() {
         viewButton.addEventListener("click", () => {
             cssInput.value = item.css;
             charCount.textContent = `${item.css.length} characters`;
+            fileName.textContent = "History CSS loaded";
+            cssInput.dispatchEvent(new Event("input"));
         });
 
         historyItem.append(date, details, viewButton);
@@ -211,30 +291,3 @@ document.getElementById("clear-history").addEventListener("click", () => {
 
 // Load history on startup
 loadHistory();
-
-// Upload CSS file
-cssFile.addEventListener("change", () => {
-    const file = cssFile.files[0];
-
-    if (!file) return;
-
-    if (!file.name.toLowerCase().endsWith(".css")) {
-        alert("Please select a CSS file.");
-        cssFile.value = "";
-        return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-        cssInput.value = reader.result;
-        charCount.textContent = `${cssInput.value.length} characters`;
-        fileName.textContent = file.name;
-    };
-
-    reader.onerror = () => {
-        alert("Unable to read this file.");
-    };
-
-    reader.readAsText(file);
-});

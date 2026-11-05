@@ -1,3 +1,4 @@
+
 // Find selectors
 function getSelectors(css) {
     const selectors = [];
@@ -10,7 +11,9 @@ function getSelectors(css) {
         const selector = match[1].trim();
 
         if (selector && !selector.startsWith("@")) {
-            selectors.push(...selector.split(",").map(item => item.trim()));
+            selectors.push(
+                ...selector.split(",").map(item => item.trim())
+            );
         }
     }
 
@@ -26,4 +29,58 @@ function getDuplicateSelectors(css) {
     });
 }
 
-export { getSelectors, getDuplicateSelectors };
+// Find CSS syntax warnings
+function getCSSWarnings(css) {
+    const warnings = [];
+    const cleanCSS = css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+    let openBraces = 0;
+
+    for (const character of cleanCSS) {
+        if (character === "{") openBraces++;
+        if (character === "}") openBraces--;
+
+        if (openBraces < 0) {
+            warnings.push("Unexpected closing brace '}'.");
+            openBraces = 0;
+        }
+    }
+
+    if (openBraces > 0) {
+        warnings.push("Missing closing brace '}'.");
+    }
+
+    const rules = cleanCSS.match(/[^{}]+\{[^{}]*\}/g) || [];
+
+    rules.forEach((rule) => {
+        const content = rule.substring(
+            rule.indexOf("{") + 1,
+            rule.lastIndexOf("}")
+        ).trim();
+
+        if (!content) {
+            warnings.push("Empty CSS rule found.");
+            return;
+        }
+
+        const declarations = content.split(";");
+
+        declarations.forEach((declaration) => {
+            const item = declaration.trim();
+
+            if (item && !item.includes(":")) {
+                warnings.push(
+                    `Possible invalid declaration: "${item}".`
+                );
+            }
+        });
+    });
+
+    return [...new Set(warnings)];
+}
+
+export {
+    getSelectors,
+    getDuplicateSelectors,
+    getCSSWarnings
+};
