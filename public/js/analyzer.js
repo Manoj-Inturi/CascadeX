@@ -8,11 +8,7 @@ function getSelectors(css) {
     while ((match = regex.exec(css)) !== null) {
         const selector = match[1].trim();
 
-        if (
-            selector &&
-            !selector.startsWith("@") &&
-            !selector.startsWith("/*")
-        ) {
+        if (selector && !selector.startsWith("@")) {
             selectors.push(...selector.split(",").map(item => item.trim()));
         }
     }
@@ -20,4 +16,13 @@ function getSelectors(css) {
     return selectors;
 }
 
-export { getSelectors };
+// Find duplicates
+function getDuplicateSelectors(css) {
+    const selectors = getSelectors(css);
+
+    return selectors.filter((selector, index) => {
+        return selectors.indexOf(selector) !== index;
+    });
+}
+
+export { getSelectors, getDuplicateSelectors };

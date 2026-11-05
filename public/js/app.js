@@ -1,5 +1,6 @@
-import { getSelectors } from "./analyzer.js";
+import { getSelectors, getDuplicateSelectors } from "./analyzer.js";
 import { calculateSpecificity } from "./specificity.js";
+
 // Theme button
 const themeButton = document.getElementById("theme-toggle");
 
@@ -41,6 +42,7 @@ clearButton.addEventListener("click", () => {
     cssInput.value = "";
     characterCount.textContent = "0 characters";
 });
+
 // File upload
 const cssFile = document.getElementById("css-file");
 const fileName = document.getElementById("file-name");
@@ -83,6 +85,7 @@ analyzeButton.addEventListener("click", () => {
     }
 
     const selectors = getSelectors(css);
+    const duplicates = getDuplicateSelectors(css);
 
     resultsList.innerHTML = "";
 
@@ -96,19 +99,27 @@ analyzeButton.addEventListener("click", () => {
     resultsPlaceholder.style.display = "none";
 
     // Show results
-selectors.forEach((selector) => {
-    const item = document.createElement("div");
-    const name = document.createElement("span");
-    const score = document.createElement("span");
+    selectors.forEach((selector) => {
+        const item = document.createElement("div");
+        const name = document.createElement("span");
+        const score = document.createElement("span");
+        const status = document.createElement("span");
 
-    item.className = "result-item";
+        item.className = "result-item";
 
-    name.textContent = selector;
-    score.textContent = calculateSpecificity(selector);
+        name.textContent = selector;
+        score.textContent = calculateSpecificity(selector);
 
-    item.appendChild(name);
-    item.appendChild(score);
+        if (duplicates.includes(selector)) {
+            status.textContent = "Duplicate";
+        } else {
+            status.textContent = "Unique";
+        }
 
-    resultsList.appendChild(item);
-});
+        item.appendChild(name);
+        item.appendChild(score);
+        item.appendChild(status);
+
+        resultsList.appendChild(item);
+    });
 });
