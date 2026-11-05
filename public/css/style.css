@@ -457,3 +457,19 @@ label:focus-visible {
         flex: 1;
     }
 }
+
+/* Results */
+#results-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.result-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: Consolas, monospace;
+    color: var(--text);
+}

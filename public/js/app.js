@@ -1,3 +1,4 @@
+import { getSelectors } from "./analyzer.js";
 // Theme button
 const themeButton = document.getElementById("theme-toggle");
 
@@ -65,4 +66,40 @@ cssFile.addEventListener("change", (event) => {
     };
 
     reader.readAsText(file);
+});
+
+// Analyze CSS
+const analyzeButton = document.getElementById("analyze-css");
+const resultsPlaceholder = document.getElementById("results-placeholder");
+const resultsList = document.getElementById("results-list");
+
+analyzeButton.addEventListener("click", () => {
+    const css = cssInput.value.trim();
+
+    if (!css) {
+        alert("Please enter some CSS");
+        return;
+    }
+
+    const selectors = getSelectors(css);
+
+    resultsList.innerHTML = "";
+
+    if (selectors.length === 0) {
+        resultsPlaceholder.style.display = "block";
+        resultsPlaceholder.querySelector("h3").textContent = "No selectors found";
+        resultsPlaceholder.querySelector("p").textContent = "Try entering valid CSS.";
+        return;
+    }
+
+    resultsPlaceholder.style.display = "none";
+
+    selectors.forEach((selector) => {
+        const item = document.createElement("div");
+
+        item.className = "result-item";
+        item.textContent = selector;
+
+        resultsList.appendChild(item);
+    });
 });
