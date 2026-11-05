@@ -1,3 +1,4 @@
+
 import { getSelectors, getDuplicateSelectors } from "./analyzer.js";
 import { calculateSpecificity } from "./specificity.js";
 
@@ -41,6 +42,14 @@ cssInput.addEventListener("input", () => {
 clearButton.addEventListener("click", () => {
     cssInput.value = "";
     characterCount.textContent = "0 characters";
+    cssFile.value = "";
+    fileName.textContent = "No file selected";
+    resultsList.innerHTML = "";
+    resultsPlaceholder.style.display = "block";
+    resultsPlaceholder.querySelector("h3").textContent = "No results yet";
+    resultsPlaceholder.querySelector("p").textContent =
+        "Paste your CSS and click Analyze CSS to begin.";
+    analysisSummary.hidden = true;
 });
 
 // File upload
@@ -54,7 +63,7 @@ cssFile.addEventListener("change", (event) => {
         return;
     }
 
-    if (!file.name.endsWith(".css")) {
+    if (!file.name.toLowerCase().endsWith(".css")) {
         alert("Please select a CSS file");
         cssFile.value = "";
         return;
@@ -72,10 +81,10 @@ cssFile.addEventListener("change", (event) => {
 });
 
 // Analyze CSS
-// Analyze CSS
 const analyzeButton = document.getElementById("analyze-css");
 const resultsPlaceholder = document.getElementById("results-placeholder");
 const resultsList = document.getElementById("results-list");
+const analysisSummary = document.getElementById("analysis-summary");
 
 analyzeButton.addEventListener("click", () => {
     const css = cssInput.value.trim();
@@ -94,19 +103,38 @@ analyzeButton.addEventListener("click", () => {
         resultsPlaceholder.style.display = "block";
         resultsPlaceholder.querySelector("h3").textContent = "No selectors found";
         resultsPlaceholder.querySelector("p").textContent = "Try entering valid CSS.";
+        analysisSummary.hidden = true;
         return;
     }
 
     resultsPlaceholder.style.display = "none";
 
+    // Update summary
+    const duplicateCount = new Set(duplicates).size;
+    const uniqueCount = new Set(selectors).size - duplicateCount;
+
+    analysisSummary.hidden = false;
+
+    document.getElementById("total-selectors").textContent = selectors.length;
+    document.getElementById("total-duplicates").textContent = duplicateCount;
+    document.getElementById("total-unique").textContent = uniqueCount;
+
     // Result heading
     const heading = document.createElement("div");
+
     heading.className = "result-header";
-    heading.innerHTML = `
-        <span>Selector</span>
-        <span>Specificity</span>
-        <span>Status</span>
-    `;
+
+    const selectorHeading = document.createElement("span");
+    const specificityHeading = document.createElement("span");
+    const statusHeading = document.createElement("span");
+
+    selectorHeading.textContent = "Selector";
+    specificityHeading.textContent = "Specificity";
+    statusHeading.textContent = "Status";
+
+    heading.appendChild(selectorHeading);
+    heading.appendChild(specificityHeading);
+    heading.appendChild(statusHeading);
 
     resultsList.appendChild(heading);
 

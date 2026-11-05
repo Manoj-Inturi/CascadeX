@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,7 +49,6 @@
                 </div>
 
                 <div class="stats">
-
                     <div class="stat-card">
                         <p>Files Analyzed</p>
                         <h3 id="files-analyzed">0</h3>
@@ -63,7 +63,6 @@
                         <p>Warnings</p>
                         <h3 id="warning-count">0</h3>
                     </div>
-
                 </div>
             </section>
 
@@ -93,12 +92,14 @@
                             <label for="css-file" class="file-button">
                                 Upload CSS
                             </label>
+
                             <input
                                 type="file"
                                 id="css-file"
                                 accept=".css,text/css"
                                 hidden
                             >
+
                             <span id="file-name">No file selected</span>
                         </div>
 
@@ -106,6 +107,7 @@
                             <button id="clear-css" class="secondary-button">
                                 Clear
                             </button>
+
                             <button id="analyze-css" class="primary-button">
                                 Analyze CSS
                             </button>
@@ -120,6 +122,24 @@
                     <div id="results-placeholder" class="results-placeholder">
                         <h3>No results yet</h3>
                         <p>Paste your CSS and click Analyze CSS to begin.</p>
+                    </div>
+
+                    <!-- Summary -->
+                    <div id="analysis-summary" class="analysis-summary" hidden>
+                        <div class="summary-card">
+                            <p>Total Selectors</p>
+                            <h3 id="total-selectors">0</h3>
+                        </div>
+
+                        <div class="summary-card">
+                            <p>Duplicate Selectors</p>
+                            <h3 id="total-duplicates">0</h3>
+                        </div>
+
+                        <div class="summary-card">
+                            <p>Unique Selectors</p>
+                            <h3 id="total-unique">0</h3>
+                        </div>
                     </div>
 
                     <div id="results-list"></div>
