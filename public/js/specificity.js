@@ -26,7 +26,7 @@ function calculateSpecificity(selector) {
 
     elements = elementMatches ? elementMatches.length : 0;
 
-    return `${ids}, ${classes}, ${elements}`;
+    return `${ids} ID, ${classes} CLASS, ${elements} ELEMENT`;
 }
 
 export { calculateSpecificity };
