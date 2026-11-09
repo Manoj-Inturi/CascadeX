@@ -336,24 +336,58 @@
                     <div>
                         <p class="eyebrow">YOUR ANALYSIS</p>
                         <h2>Analysis results</h2>
-                        <p>Review the selectors found in your stylesheet.</p>
+                        <p>Filter, search and inspect the issues found in your stylesheet.</p>
                     </div>
 
                     <span class="workspace-number">02 / REPORT</span>
                 </div>
 
-                <div id="results-placeholder" class="results-placeholder" hidden>
-                    <h3>No results found</h3>
-                    <p>Try analyzing another stylesheet.</p>
+                <div class="results-counts" aria-label="Issue counts">
+                    <button class="result-count-card active" type="button" data-filter="all" aria-pressed="true">
+                        <span>ALL ISSUES</span>
+                        <strong id="result-count-all">0</strong>
+                    </button>
+
+                    <button class="result-count-card" type="button" data-filter="error" aria-pressed="false">
+                        <span>ERRORS</span>
+                        <strong id="result-count-error">0</strong>
+                    </button>
+
+                    <button class="result-count-card" type="button" data-filter="warning" aria-pressed="false">
+                        <span>WARNINGS</span>
+                        <strong id="result-count-warning">0</strong>
+                    </button>
+
+                    <button class="result-count-card" type="button" data-filter="info" aria-pressed="false">
+                        <span>INFO</span>
+                        <strong id="result-count-info">0</strong>
+                    </button>
                 </div>
 
-                <div id="results-list">
-                    <div class="result-header">
-                        <span>Selector</span>
-                        <span>Specificity</span>
-                        <span>Status</span>
-                    </div>
+                <div class="results-toolbar">
+                    <label class="result-search">
+                        <span>Search issues</span>
+                        <input id="results-search" type="search" placeholder="Search by issue, selector or explanation">
+                    </label>
+
+                    <label class="result-sort">
+                        <span>Sort by</span>
+                        <select id="results-sort">
+                            <option value="severity">Severity</option>
+                            <option value="selector">Selector A–Z</option>
+                            <option value="title">Issue A–Z</option>
+                        </select>
+                    </label>
+
+                    <span id="results-visible-count" class="results-visible-count">0 issues</span>
                 </div>
+
+                <div id="results-placeholder" class="results-placeholder" hidden>
+                    <h3>No matching issues</h3>
+                    <p>Try another filter or search term.</p>
+                </div>
+
+                <div id="results-list" class="results-list"></div>
 
             </section>
 
