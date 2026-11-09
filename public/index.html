@@ -219,12 +219,17 @@
                         </div>
 
                         <div class="editor-body">
-                            <div class="editor-line">CSS</div>
+                            <div id="editor-gutter" class="editor-gutter" aria-hidden="true">
+                                <div id="editor-line-numbers" class="editor-line-numbers"></div>
+                            </div>
 
-                            <textarea
-                                id="css-input"
-                                spellcheck="false"
-                                placeholder="/* Paste your CSS here */
+                            <div class="editor-code-area">
+                                <pre id="css-highlight" class="css-highlight" aria-hidden="true"><code id="css-highlight-code"></code></pre>
+                                <textarea
+                                    id="css-input"
+                                    spellcheck="false"
+                                    wrap="off"
+                                    placeholder="/* Paste your CSS here */
 
 .container {
     display: flex;
@@ -236,7 +241,8 @@
 }
 
 /* Start analyzing your styles... */"
-                            ></textarea>
+                                ></textarea>
+                            </div>
                         </div>
 
                         <div class="editor-footer">

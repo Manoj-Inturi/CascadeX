@@ -645,26 +645,44 @@ label:focus-visible {
 .editor-body {
     position: relative;
     display: flex;
-    min-height: 295px;
+    height: 380px;
+    min-height: 0;
+    overflow: hidden;
     background: var(--surface);
 }
 
-.editor-line {
-    width: 47px;
-    padding: 20px 0;
+.editor-gutter {
+    box-sizing: border-box;
+    flex: 0 0 48px;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding: 19px 0;
     border-right: 1px solid var(--border);
     color: var(--text-muted);
     font-family: "DM Mono", monospace;
     font-size: 10px;
+    line-height: 22.8px;
     text-align: center;
+    user-select: none;
+}
+
+.editor-line-numbers span {
+    display: block;
+    height: 22.8px;
 }
 
 #css-input {
+    box-sizing: border-box;
     display: block;
-    width: 100%;
-    min-height: 295px;
+    flex: 1 1 auto;
+    width: 0;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    max-height: 100%;
     padding: 19px 20px;
-    resize: vertical;
+    resize: none;
     border: none;
     outline: none;
     background: transparent;
@@ -673,6 +691,24 @@ label:focus-visible {
     font-size: 12px;
     line-height: 1.9;
     tab-size: 4;
+    white-space: pre;
+    overflow: auto;
+    scrollbar-gutter: stable;
+}
+
+#css-input::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+#css-input::-webkit-scrollbar-thumb {
+    background: var(--border-strong, var(--border));
+    border: 2px solid var(--surface);
+    border-radius: 8px;
+}
+
+#css-input::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 #css-input::placeholder {
@@ -1610,4 +1646,141 @@ button:disabled {
     .result-card-meta {
         gap: 6px;
     }
+}
+
+/* Syntax Highlighting */
+.editor-code-area {
+    position: relative;
+    flex: 1 1 auto;
+    width: 0;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.css-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: max-content;
+    min-width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 19px 20px;
+    overflow: visible;
+    color: var(--text);
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.9;
+    letter-spacing: normal;
+    tab-size: 4;
+    white-space: pre;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.css-highlight code {
+    display: block;
+    min-height: 100%;
+    font: inherit;
+    white-space: inherit;
+}
+
+#css-input {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    padding: 19px 20px;
+    background: transparent;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    caret-color: var(--text);
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    letter-spacing: normal;
+    tab-size: 4;
+    white-space: pre;
+    overflow: auto;
+}
+
+#css-input::placeholder {
+    color: var(--text-muted);
+    -webkit-text-fill-color: var(--text-muted);
+}
+
+#css-input::selection {
+    background: rgba(104, 115, 94, 0.28);
+}
+
+.token-comment {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.token-string {
+    color: #718B70;
+}
+
+.token-important {
+    color: #B45F54;
+    font-weight: 600;
+}
+
+.token-at-rule {
+    color: #8A78A8;
+}
+
+.token-variable {
+    color: #A47B42;
+}
+
+.token-hash,
+.token-class,
+.token-pseudo {
+    color: var(--accent);
+}
+
+.token-number {
+    color: #8A8B58;
+}
+
+.token-punctuation {
+    color: var(--text-muted);
+}
+
+.token-property {
+    color: var(--text);
+}
+
+.token-function {
+    color: #668A91;
+}
+
+[data-theme="dark"] .token-string {
+    color: #A4C49A;
+}
+
+[data-theme="dark"] .token-important {
+    color: #E19A91;
+}
+
+[data-theme="dark"] .token-at-rule {
+    color: #B9A5D8;
+}
+
+[data-theme="dark"] .token-variable {
+    color: #D3B17A;
+}
+
+[data-theme="dark"] .token-number {
+    color: #C1C28A;
+}
+
+[data-theme="dark"] .token-function {
+    color: #98C0C5;
 }

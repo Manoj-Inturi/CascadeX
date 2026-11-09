@@ -6,6 +6,10 @@ import {
 
 // Get elements
 const cssInput = document.getElementById("css-input");
+const editorGutter = document.getElementById("editor-gutter");
+const editorLineNumbers = document.getElementById("editor-line-numbers");
+const cssHighlight = document.getElementById("css-highlight");
+const cssHighlightCode = document.getElementById("css-highlight-code");
 const analyzeButton = document.getElementById("analyze-button");
 const clearButton = document.getElementById("clear-button");
 const themeToggle = document.getElementById("theme-toggle");
@@ -61,16 +65,111 @@ function resetResults() {
     updateActiveFilter();
 }
 
+// Update line numbers
+function updateLineNumbers() {
+    const lineCount = cssInput.value.split("\n").length;
+    const fragment = document.createDocumentFragment();
+
+    for (let line = 1; line <= lineCount; line++) {
+        const number = document.createElement("span");
+        number.textContent = line;
+        fragment.appendChild(number);
+    }
+
+    editorLineNumbers.replaceChildren(fragment);
+    editorGutter.scrollTop = cssInput.scrollTop;
+}
+
+// Highlight CSS
+function highlightCSS(css) {
+    const tokenPattern = /(\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|!\s*important\b|@[a-zA-Z-][\w-]*|--[\w-]+|#[\w-]+|\.[\w-]+|::?[\w-]+|[a-zA-Z_-][\w-]*(?=\s*:)|[-+]?(?:\d*\.)?\d+(?:%|[a-zA-Z]+)?|[a-zA-Z_-][\w-]*(?=\s*\()|[{}()[\];:,])/gi;
+
+    let match;
+    let lastIndex = 0;
+    let html = "";
+
+    while ((match = tokenPattern.exec(css)) !== null) {
+        html += escapeHTML(css.slice(lastIndex, match.index));
+
+        const token = match[0];
+        let tokenClass = "";
+
+        if (token.startsWith("/*")) {
+            tokenClass = "token-comment";
+        } else if (token.startsWith("\"") || token.startsWith("'")) {
+            tokenClass = "token-string";
+        } else if (/^!\s*important$/i.test(token)) {
+            tokenClass = "token-important";
+        } else if (token.startsWith("@")) {
+            tokenClass = "token-at-rule";
+        } else if (token.startsWith("--")) {
+            tokenClass = "token-variable";
+        } else if (token.startsWith("#")) {
+            tokenClass = "token-hash";
+        } else if (token.startsWith(".")) {
+            tokenClass = "token-class";
+        } else if (token.startsWith(":") && token.length > 1) {
+            tokenClass = "token-pseudo";
+        } else if (/^[-+]?(?:\d*\.)?\d+(?:%|[a-zA-Z]+)?$/.test(token)) {
+            tokenClass = "token-number";
+        } else if (/^[{}()[\];:,]$/.test(token)) {
+            tokenClass = "token-punctuation";
+        } else if (/^[a-zA-Z_-][\w-]*$/.test(token)) {
+            tokenClass = tokenPattern.lastIndex < css.length && /^\s*\(/.test(css.slice(tokenPattern.lastIndex))
+                ? "token-function"
+                : "token-property";
+        }
+
+        if (tokenClass) {
+            html += `<span class="${tokenClass}">${escapeHTML(token)}</span>`;
+        } else {
+            html += escapeHTML(token);
+        }
+
+        lastIndex = tokenPattern.lastIndex;
+    }
+
+    html += escapeHTML(css.slice(lastIndex));
+    return html;
+}
+
+// Escape editor text
+function escapeHTML(text) {
+    return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+}
+
+// Update highlighted CSS
+function updateCSSHighlight() {
+    cssHighlightCode.innerHTML = highlightCSS(cssInput.value);
+    syncEditorScroll();
+}
+
+// Sync editor scroll
+function syncEditorScroll() {
+    editorGutter.scrollTop = cssInput.scrollTop;
+    cssHighlight.style.transform = `translate(${-cssInput.scrollLeft}px, ${-cssInput.scrollTop}px)`;
+}
+
 // Character counter
 cssInput.addEventListener("input", () => {
     charCount.textContent = `${cssInput.value.length} characters`;
+    updateLineNumbers();
+    updateCSSHighlight();
     resetResults();
 });
+
+// Sync editor scroll
+cssInput.addEventListener("scroll", syncEditorScroll);
 
 // Clear editor
 clearButton.addEventListener("click", () => {
     cssInput.value = "";
     charCount.textContent = "0 characters";
+    updateLineNumbers();
+    updateCSSHighlight();
     fileName.textContent = "No file selected";
     cssFile.value = "";
     resetResults();
@@ -93,6 +192,8 @@ cssFile.addEventListener("change", () => {
     reader.onload = () => {
         cssInput.value = reader.result;
         charCount.textContent = `${cssInput.value.length} characters`;
+        updateLineNumbers();
+        updateCSSHighlight();
         fileName.textContent = file.name;
         resetResults();
     };
@@ -391,6 +492,8 @@ function loadHistory() {
         viewButton.addEventListener("click", () => {
             cssInput.value = item.css;
             charCount.textContent = `${item.css.length} characters`;
+            updateLineNumbers();
+            updateCSSHighlight();
             fileName.textContent = "History CSS loaded";
             resetResults();
         });
@@ -406,5 +509,7 @@ document.getElementById("clear-history").addEventListener("click", () => {
     loadHistory();
 });
 
-// Load history
+// Load editor
+updateLineNumbers();
+updateCSSHighlight();
 loadHistory();
