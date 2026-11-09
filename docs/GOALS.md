@@ -1,60 +1,53 @@
 # CascadeX — Project Goals
 
-## 1. Vision
+## Vision
 
-Make CSS easier to understand, debug, and maintain by explaining how styles interact and why particular declarations win.
+Make CSS easier to understand, debug, and maintain by giving developers a focused workspace that explains common stylesheet problems.
 
-## 2. Primary Goals
+## Problem
 
-### CSS Conflict Detection
+As stylesheets grow, developers can encounter repeated selectors, conflicting declarations, unclear specificity, excessive `!important` usage, and fragile selector structures. Finding these patterns manually can take time, especially when a stylesheet has accumulated over multiple iterations.
 
-Identify competing CSS declarations that affect the same property on the same element.
+## Mission
 
-### Specificity Analysis
+CascadeX aims to turn CSS source into actionable explanations. It should help developers understand why a pattern may be problematic and where to investigate, while keeping the developer in control of any changes.
 
-Calculate selector specificity and explain how it influences the cascade.
+## Current objectives
 
-### Cascade Explanation
+1. Provide a simple browser-based CSS editing experience.
+2. Make CSS easier to scan with syntax highlighting and line numbers.
+3. Detect common CSS maintenance issues using static analysis.
+4. Explain potential cascade conflicts and specificity.
+5. Present findings in a searchable, filterable results workspace.
+6. Keep the interface responsive and support light and dark themes.
+7. Preserve useful local preferences and analysis history.
 
-Explain why a declaration wins by considering relevant cascade rules, including importance, layers, specificity, and source order.
+## Product principles
 
-### Fragility Detection
+- **Clarity first:** Findings should be understandable and specific.
+- **No silent edits:** The analyzer reports issues; it does not rewrite user CSS automatically.
+- **Developer control:** Users decide what to change.
+- **Honest analysis:** Heuristic findings must be labelled as potential issues where certainty is not possible.
+- **Lightweight stack:** Prefer browser-native capabilities and avoid unnecessary dependencies.
+- **Usable interface:** Keep the editor, results, and explanations easy to navigate.
 
-Identify potentially fragile styling patterns, including excessive specificity and unnecessary `!important` declarations.
+## Current scope
 
-### Actionable Recommendations
+The current release focuses on CSS text and stylesheet-level analysis in the browser. It does not yet analyze an entire website project or determine computed styles from a live DOM.
 
-Suggest improvements that make stylesheets easier to understand and maintain.
+## Success criteria
 
-## 3. Target Users
+- A developer can paste or upload a CSS file and run an analysis.
+- Findings are grouped by severity and can be searched and sorted.
+- The editor remains usable with long stylesheets.
+- The interface works in light and dark themes.
+- Analysis limitations are documented clearly.
+- The live deployment remains accessible.
 
-* Frontend developers
-* Web development students
-* Developers maintaining large CSS codebases
-* Teams debugging unexpected visual behavior
+## Out of scope for the current release
 
-## 4. Design Principles
-
-* **Accuracy:** Avoid reporting conflicts without sufficient evidence.
-* **Clarity:** Explain findings in simple language.
-* **Maintainability:** Encourage understandable CSS.
-* **Transparency:** Communicate analysis limitations.
-* **Incremental development:** Build and test features in manageable steps.
-
-## 5. Initial Scope
-
-The first version will focus on standard CSS files.
-
-Framework-specific analysis, GitHub repository integration, and advanced project analysis will be considered after the core analyzer is working.
-
-## 6. Success Criteria
-
-The initial version should be able to:
-
-1. Accept CSS input.
-2. Parse CSS declarations.
-3. Calculate selector specificity for supported selectors.
-4. Identify competing declarations under supported conditions.
-5. Explain cascade outcomes when sufficient information is available.
-6. Present readable analysis results.
-7. Pass automated tests for supported cases.
+- Full browser-equivalent cascade evaluation.
+- Guaranteed detection of every CSS syntax error.
+- Automatic code changes without user review.
+- Full-project ZIP upload and HTML-to-CSS dependency mapping.
+- Server-side accounts, cloud project storage, or team collaboration.

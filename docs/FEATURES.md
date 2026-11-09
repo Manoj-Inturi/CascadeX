@@ -1,143 +1,77 @@
-# CascadeX — Feature Specification
+# CascadeX — Feature Reference
 
-## 1. Overview
+This document describes the features in the current browser-based application. It distinguishes implemented behavior from future ideas.
 
-CascadeX aims to help developers understand CSS conflicts, investigate cascade behavior, and identify potentially fragile styling patterns.
+## 1. CSS editor
 
-This document defines the planned features and their priorities.
+| Feature | Description | Status |
+|---|---|---|
+| CSS text input | Paste or type stylesheet source | Implemented |
+| Line numbers | Displays line numbers beside the editor | Implemented |
+| Syntax highlighting | Highlights common CSS tokens while editing | Implemented |
+| Fixed editor area | Keeps long input inside a bounded editor | Implemented |
+| Vertical scrolling | Scrolls through long stylesheets | Implemented |
+| Horizontal scrolling | Supports long lines without wrapping the source | Implemented |
+| Character count | Displays the current input length | Implemented |
+| CSS file upload | Loads a `.css` file into the editor | Implemented |
+| Clear action | Clears editor content | Implemented |
 
-## 2. Core Features
+## 2. Static analysis
 
-### 2.1 CSS Input
+| Check | Description | Status |
+|---|---|---|
+| Repeated selectors | Finds selectors that occur in multiple rules | Implemented |
+| Conflicting repeated declarations | Reports differing values across repeated selector rules | Implemented |
+| Repeated declarations | Detects repeated properties with different values in a rule | Implemented |
+| Potential cascade conflicts | Compares declarations across selectors | Implemented |
+| Specificity calculation | Estimates selector specificity | Implemented |
+| `!important` overuse | Flags rules with multiple important declarations | Implemented |
+| Undefined custom properties | Finds `var()` references without a visible declaration and without a fallback | Implemented |
+| Unused custom properties | Finds declared custom properties with no detected `var()` reference | Implemented |
+| Empty rules | Finds rules with no declarations | Implemented |
+| Basic syntax warnings | Checks selected structural and declaration problems | Implemented |
+| Fragile selectors | Flags multiple ID selectors and deeply nested selectors | Implemented |
 
-Users should be able to provide CSS for analysis.
+### Interpretation notes
 
-Planned capabilities:
+- Cascade conflicts are potential conflicts, not proof of a computed-style collision.
+- Specificity is calculated by a lightweight implementation and may not cover every selector edge case.
+- Variable checks only see the CSS source supplied to the analyzer.
+- Static checks do not replace browser developer tools.
 
-* Upload a CSS file.
-* Paste CSS into an editor.
-* Validate empty or invalid input.
-* Display useful error messages.
+## 3. Results workspace
 
-### 2.2 CSS Parsing
+| Feature | Description | Status |
+|---|---|---|
+| Severity summary | Displays error, warning, and information counts | Implemented |
+| Severity filters | Filters findings by category | Implemented |
+| Search | Searches issue title, selector, and explanation | Implemented |
+| Sorting | Sorts findings by supported fields | Implemented |
+| Expandable details | Reveals additional issue explanation | Implemented |
+| Empty state | Explains when no results match the current filter | Implemented |
+| Report export | Exports the analysis report | Implemented |
 
-The analyzer will parse CSS into a structured representation.
+The information category is available in the interface; the analyzer may return zero information-level findings for a given stylesheet.
 
-Planned capabilities:
+## 4. Workspace and preferences
 
-* Read CSS rules and declarations.
-* Extract selectors and property values.
-* Preserve source locations where possible.
-* Handle comments and common CSS syntax.
-* Report parsing errors clearly.
+| Feature | Description | Status |
+|---|---|---|
+| Light theme | Default light appearance | Implemented |
+| Dark theme | Alternative dark appearance | Implemented |
+| Theme persistence | Saves the selected theme in browser local storage | Implemented |
+| Analysis history | Stores recent analyses in browser local storage | Implemented |
+| Clear history | Removes locally stored analysis history | Implemented |
+| Responsive layout | Adapts the workspace to smaller screens | Implemented |
 
-### 2.3 Specificity Analysis
+## 5. Planned capabilities
 
-The analyzer will calculate selector specificity.
+These are not represented as completed features:
 
-Planned capabilities:
-
-* Support element selectors.
-* Support class and attribute selectors.
-* Support ID selectors.
-* Handle supported pseudo-classes and pseudo-elements.
-* Explain how specificity influences the cascade.
-
-### 2.4 Conflict Detection
-
-The analyzer will identify declarations that compete to set the same property on the same element.
-
-Planned capabilities:
-
-* Compare declarations from different rules.
-* Identify differing values for the same property.
-* Distinguish potential conflicts from confirmed conflicts.
-* Avoid treating every repeated selector as a bug.
-
-### 2.5 Cascade Explanation
-
-The analyzer will explain why a declaration wins when sufficient information is available.
-
-Relevant factors include:
-
-* Cascade origin and importance.
-* Cascade layers.
-* Scoping and specificity.
-* Source order.
-* Conditional rule applicability.
-
-### 2.6 Fragility Detection
-
-The analyzer will identify patterns that may make CSS difficult to maintain.
-
-Examples:
-
-* Unnecessary `!important` declarations.
-* Excessively specific selectors.
-* Repeated override chains.
-* Fragile dependencies on stylesheet order.
-
-Findings should include an explanation rather than an unexplained warning.
-
-### 2.7 Recommendations
-
-The tool will suggest possible improvements, such as:
-
-* Simplifying selectors.
-* Removing unnecessary overrides.
-* Reducing specificity.
-* Organizing related styles.
-* Making styling dependencies more explicit.
-
-Recommendations will not automatically modify source files in the initial release.
-
-## 3. User Interface
-
-The dashboard should provide:
-
-* A CSS input area.
-* A file upload control.
-* An analysis action.
-* A summary of findings.
-* A list of detected conflicts.
-* Specificity information.
-* Explanations and recommendations.
-* Clear loading, success, and error states.
-
-## 4. Future Features
-
-These features are outside the initial release:
-
-* React and JSX awareness.
-* Tailwind CSS analysis.
-* CSS Modules and CSS-in-JS support.
-* GitHub repository integration.
-* Project-wide dependency analysis.
-* Automated source-code fixes.
-
-## 5. Development Priority
-
-**P0 — Initial release**
-
-* CSS input.
-* CSS parsing.
-* Specificity analysis.
-* Basic conflict detection.
-* Cascade explanations for supported cases.
-
-**P1 — Improvements**
-
-* Fragility detection.
-* Recommendations.
-* Multi-file analysis.
-* Expanded test coverage.
-
-**P2 — Advanced analysis**
-
-* Framework-aware analysis.
-* More advanced cascade features.
-* GitHub integration.
-
-## 6. Guiding Principle
-
-CascadeX should prioritize accurate, explainable findings over the number of warnings it generates.
+- Inline editor diagnostics and navigation to the source line.
+- More complete CSS parsing and broader syntax coverage.
+- HTML and stylesheet relationship mapping.
+- ZIP upload for complete website projects.
+- Reviewable fix suggestions with before-and-after comparison.
+- Corrected project export.
+- Analysis comparison across runs.

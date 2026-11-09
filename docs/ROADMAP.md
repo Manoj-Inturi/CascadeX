@@ -1,122 +1,65 @@
-# CascadeX — Development Roadmap
+# CascadeX — Roadmap
 
-## Phase 1: Project Foundation
+This roadmap separates the completed baseline from future development. Items marked planned are not available in the current live application unless subsequently implemented.
 
-**Goal:** Establish a clean, maintainable development environment.
+## Completed — UI and editor foundation
 
-* [x] Create the GitHub repository.
-* [x] Add the project README.
-* [x] Define project goals.
-* [x] Document the initial feature scope.
-* [ ] Establish repository conventions.
-* [ ] Configure Node.js and npm.
-* [ ] Create the initial folder structure.
+- [x] Browser-based CSS workspace.
+- [x] Light and dark themes.
+- [x] CSS input and file upload.
+- [x] Line numbers.
+- [x] Fixed-height editor with vertical and horizontal scrolling.
+- [x] CSS syntax highlighting.
+- [x] Analysis results summary and severity filters.
+- [x] Search and sorting for results.
+- [x] Expandable issue details.
+- [x] Local analysis history.
+- [x] Report export.
+- [x] Static CSS analysis checks.
 
-## Phase 2: Frontend Dashboard
+## Next — Editor diagnostics
 
-**Goal:** Build the user interface using HTML, CSS, and vanilla JavaScript.
+- [ ] Identify syntax problems more precisely.
+- [ ] Highlight the affected line and token.
+- [ ] Navigate from an issue to its source location.
+- [ ] Improve keyboard navigation and editor accessibility.
+- [ ] Add test fixtures for valid and invalid CSS examples.
 
-* [ ] Create the dashboard layout.
-* [ ] Establish design tokens and CSS variables.
-* [ ] Build reusable interface components.
-* [ ] Add a CSS input editor.
-* [ ] Add file upload controls.
-* [ ] Create the analysis results panel.
-* [ ] Add loading, success, empty, and error states.
-* [ ] Make the dashboard responsive.
+## Next — Analyzer reliability
 
-## Phase 3: CSS Parsing
+- [ ] Expand parsing coverage for modern CSS syntax.
+- [ ] Improve nested at-rule handling.
+- [ ] Add regression tests for selectors, declarations, variables, and cascade cases.
+- [ ] Reduce duplicate or misleading findings.
+- [ ] Clearly distinguish definite source patterns from heuristic warnings.
+- [ ] Benchmark analysis with larger stylesheets.
 
-**Goal:** Convert CSS input into a structured representation.
+## Future — Full project analysis
 
-* [ ] Integrate PostCSS.
-* [ ] Parse CSS rules and declarations.
-* [ ] Extract selectors, properties, and values.
-* [ ] Preserve source locations where possible.
-* [ ] Handle empty and invalid CSS.
-* [ ] Add parser tests.
+- [ ] Accept a website project ZIP.
+- [ ] Validate archive contents and safely extract supported files.
+- [ ] Identify HTML and CSS files.
+- [ ] Map linked stylesheets to HTML documents.
+- [ ] Analyze stylesheets across the project.
+- [ ] Show findings grouped by file and source location.
 
-## Phase 4: Specificity Analysis
+## Future — CSS fix assistant
 
-**Goal:** Explain selector specificity accurately for supported selectors.
+- [ ] Explain why a finding matters.
+- [ ] Suggest a possible correction.
+- [ ] Show before-and-after code.
+- [ ] Let users accept or reject each proposed change.
+- [ ] Preserve original project files.
+- [ ] Generate a downloadable corrected project ZIP.
 
-* [ ] Implement specificity calculation.
-* [ ] Support element, class, attribute, and ID selectors.
-* [ ] Handle supported pseudo-classes and pseudo-elements.
-* [ ] Test complex selector combinations.
-* [ ] Explain specificity results in the dashboard.
+## Future — Project workflow
 
-## Phase 5: Conflict Detection
+- [ ] Save named projects.
+- [ ] Compare analysis runs.
+- [ ] Export detailed reports.
+- [ ] Improve accessibility and keyboard support.
+- [ ] Add automated quality checks to the repository.
 
-**Goal:** Identify declarations that compete to style the same element.
+## Release principle
 
-* [ ] Compare declarations affecting the same property.
-* [ ] Account for selector matching where possible.
-* [ ] Distinguish potential conflicts from confirmed conflicts.
-* [ ] Display competing declarations.
-* [ ] Explain the relevant cascade factors.
-* [ ] Add automated tests.
-
-## Phase 6: Cascade Explanation Engine
-
-**Goal:** Explain why a declaration wins when sufficient context is available.
-
-* [ ] Model relevant cascade origins and importance.
-* [ ] Account for cascade layers.
-* [ ] Evaluate specificity and source order.
-* [ ] Handle supported conditional rules.
-* [ ] Explain the winning declaration.
-* [ ] Document unsupported cases.
-
-## Phase 7: Fragility Analysis
-
-**Goal:** Identify potentially difficult-to-maintain CSS patterns.
-
-* [ ] Detect unnecessary `!important` usage.
-* [ ] Identify excessive specificity.
-* [ ] Investigate repeated override chains.
-* [ ] Detect suspicious stylesheet-order dependencies.
-* [ ] Provide actionable recommendations.
-
-## Phase 8: Backend Integration
-
-**Goal:** Connect the dashboard to a Node.js backend.
-
-* [ ] Initialize the Express server.
-* [ ] Create the CSS analysis API.
-* [ ] Validate incoming requests.
-* [ ] Connect the API to the analysis engine.
-* [ ] Add consistent error handling.
-* [ ] Test API behavior.
-
-## Phase 9: Quality and Compatibility
-
-**Goal:** Make the tool reliable and maintainable.
-
-* [ ] Expand unit tests.
-* [ ] Add integration tests.
-* [ ] Test representative real-world CSS.
-* [ ] Review performance on larger inputs.
-* [ ] Improve accessibility.
-* [ ] Document limitations.
-
-## Phase 10: Release Preparation
-
-**Goal:** Prepare CascadeX for public use.
-
-* [ ] Complete user documentation.
-* [ ] Add contribution guidelines.
-* [ ] Select an open-source license.
-* [ ] Add issue and pull-request templates.
-* [ ] Prepare screenshots and demonstrations.
-* [ ] Publish the first release.
-
-## Future Possibilities
-
-* React and JSX awareness.
-* Tailwind CSS analysis.
-* CSS Modules and CSS-in-JS support.
-* GitHub repository integration.
-* Project-wide analysis and dependency visualization.
-
-These features will be considered after the initial analyzer is working reliably.
+A roadmap item should only be marked complete after implementation, browser testing, and documentation updates. Static analysis findings should be validated against representative CSS examples before being presented as reliable checks.
