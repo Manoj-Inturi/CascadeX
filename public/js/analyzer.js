@@ -3,13 +3,32 @@ function splitSelectors(selector) {
     const selectors = [];
     let current = "";
     let depth = 0;
+    let quote = "";
 
-    for (const character of selector) {
+    for (let i = 0; i < selector.length; i++) {
+        const character = selector[i];
+
+        if (quote) {
+            current += character;
+
+            if (character === quote && selector[i - 1] !== "\\") {
+                quote = "";
+            }
+
+            continue;
+        }
+
+        if (character === "'" || character === '"') {
+            quote = character;
+            current += character;
+            continue;
+        }
+
         if (character === "(" || character === "[") depth++;
         if (character === ")" || character === "]") depth--;
 
         if (character === "," && depth === 0) {
-            selectors.push(current.trim());
+            if (current.trim()) selectors.push(current.trim());
             current = "";
         } else {
             current += character;
@@ -21,20 +40,134 @@ function splitSelectors(selector) {
     return selectors;
 }
 
+// Split declarations
+function splitTopLevel(text, delimiter) {
+    const parts = [];
+    let current = "";
+    let depth = 0;
+    let quote = "";
+
+    for (let i = 0; i < text.length; i++) {
+        const character = text[i];
+
+        if (quote) {
+            current += character;
+
+            if (character === quote && text[i - 1] !== "\\") {
+                quote = "";
+            }
+
+            continue;
+        }
+
+        if (character === "'" || character === '"') {
+            quote = character;
+            current += character;
+            continue;
+        }
+
+        if (character === "(" || character === "[") depth++;
+        if (character === ")" || character === "]") depth--;
+
+        if (character === delimiter && depth === 0) {
+            parts.push(current.trim());
+            current = "";
+        } else {
+            current += character;
+        }
+    }
+
+    if (current.trim()) parts.push(current.trim());
+
+    return parts;
+}
+
+// Find CSS rules
+function getCSSRules(css) {
+    const cleanCSS = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    const ruleRegex = /([^{}]+)\{([^{}]*)\}/g;
+    const rules = [];
+    let match;
+
+    while ((match = ruleRegex.exec(cleanCSS)) !== null) {
+        const selector = match[1].trim();
+        const content = match[2].trim();
+
+        if (!selector || selector.startsWith("@")) continue;
+
+        const declarationList = [];
+        const declarations = {};
+        const propertyMap = new Map();
+
+        splitTopLevel(content, ";").forEach((item, index) => {
+            const parts = splitTopLevel(item, ":");
+
+            if (parts.length < 2) return;
+
+            const property = parts[0].trim();
+            let value = item.substring(item.indexOf(":") + 1).trim();
+
+            if (!property || !value) return;
+
+            const important = /!\s*important\s*$/i.test(value);
+
+            value = value
+                .replace(/!\s*important\s*$/i, "")
+                .trim();
+
+            const declaration = {
+                property,
+                value,
+                important,
+                order: index
+            };
+
+            declarationList.push(declaration);
+
+            declarations[property] = {
+                value,
+                important
+            };
+
+            if (!propertyMap.has(property)) {
+                propertyMap.set(property, []);
+            }
+
+            propertyMap.get(property).push(declaration);
+        });
+
+        const duplicateDeclarations = [];
+
+        propertyMap.forEach((items, property) => {
+            const values = [...new Set(items.map(item => item.value))];
+
+            if (items.length > 1 && values.length > 1) {
+                duplicateDeclarations.push({
+                    property,
+                    declarations: items
+                });
+            }
+        });
+
+        rules.push({
+            selector,
+            declarations,
+            declarationList,
+            duplicateDeclarations,
+            order: rules.length
+        });
+    }
+
+    return rules;
+}
+
 // Find selectors
 function getSelectors(css) {
     const selectors = [];
-    const cleanCSS = css.replace(/\/\*[\s\S]*?\*\//g, "");
-    const regex = /([^{}]+)\s*\{/g;
-    let match;
 
-    while ((match = regex.exec(cleanCSS)) !== null) {
-        const selector = match[1].trim();
-
-        if (selector && !selector.startsWith("@")) {
-            selectors.push(...splitSelectors(selector));
-        }
-    }
+    getCSSRules(css).forEach((rule) => {
+        selectors.push(...splitSelectors(rule.selector));
+    });
 
     return selectors;
 }
@@ -73,25 +206,12 @@ function getCSSWarnings(css) {
         warnings.push("Missing closing brace '}'.");
     }
 
-    const rules = cleanCSS.match(/[^{}]+\{[^{}]*\}/g) || [];
+    const rules = getCSSRules(cleanCSS);
 
     rules.forEach((rule) => {
-        const content = rule
-            .substring(rule.indexOf("{") + 1, rule.lastIndexOf("}"))
-            .trim();
-
-        if (!content) {
-            warnings.push("Empty CSS rule found.");
-            return;
+        if (!rule.declarationList.length && rule.selector) {
+            warnings.push(`Empty CSS rule found: "${rule.selector}".`);
         }
-
-        content.split(";").forEach((declaration) => {
-            const item = declaration.trim();
-
-            if (item && !item.includes(":")) {
-                warnings.push(`Possible invalid declaration: "${item}".`);
-            }
-        });
     });
 
     return [...new Set(warnings)];
@@ -193,88 +313,6 @@ function selectorsCanMatchSameElement(first, second) {
     return true;
 }
 
-// Find CSS rules
-function getCSSRules(css) {
-    const cleanCSS = css.replace(/\/\*[\s\S]*?\*\//g, "");
-    const rules = cleanCSS.match(/[^{}]+\{[^{}]*\}/g) || [];
-
-    return rules.map((rule, index) => {
-        const selector = rule
-            .substring(0, rule.indexOf("{"))
-            .trim();
-
-        const content = rule
-            .substring(rule.indexOf("{") + 1, rule.lastIndexOf("}"))
-            .trim();
-
-        const declarations = {};
-        const declarationList = [];
-
-        content.split(";").forEach((declaration, declarationIndex) => {
-            const colon = declaration.indexOf(":");
-
-            if (colon === -1) return;
-
-            const property = declaration.substring(0, colon).trim();
-            let value = declaration.substring(colon + 1).trim();
-
-            if (!property || !value) return;
-
-            const important = /!\s*important\s*$/i.test(value);
-
-            value = value
-                .replace(/!\s*important\s*$/i, "")
-                .trim();
-
-            const item = {
-                property,
-                value,
-                important,
-                order: declarationIndex
-            };
-
-            declarationList.push(item);
-
-            declarations[property] = {
-                value,
-                important
-            };
-        });
-
-        const duplicateDeclarations = [];
-        const propertyMap = new Map();
-
-        declarationList.forEach((declaration) => {
-            if (!propertyMap.has(declaration.property)) {
-                propertyMap.set(declaration.property, []);
-            }
-
-            propertyMap.get(declaration.property).push(declaration);
-        });
-
-        propertyMap.forEach((items, property) => {
-            if (items.length < 2) return;
-
-            const values = [...new Set(items.map(item => item.value))];
-
-            if (values.length < 2) return;
-
-            duplicateDeclarations.push({
-                property,
-                declarations: items
-            });
-        });
-
-        return {
-            selector,
-            declarations,
-            declarationList,
-            duplicateDeclarations,
-            order: index
-        };
-    });
-}
-
 // Compare cascade priority
 function comparePriority(first, second) {
     if (first.important !== second.important) {
@@ -300,9 +338,7 @@ function getDeclarationConflicts(css) {
     const selectorMap = new Map();
 
     rules.forEach((rule) => {
-        const selectors = splitSelectors(rule.selector);
-
-        selectors.forEach((selector) => {
+        splitSelectors(rule.selector).forEach((selector) => {
             if (!selectorMap.has(selector)) {
                 selectorMap.set(selector, new Map());
             }
@@ -374,7 +410,14 @@ function getCascadeConflicts(css) {
             }
 
             Object.keys(first.declarations).forEach((property) => {
-                if (!Object.hasOwn(second.declarations, property)) return;
+                if (
+                    !Object.prototype.hasOwnProperty.call(
+                        second.declarations,
+                        property
+                    )
+                ) {
+                    return;
+                }
 
                 const firstDeclaration = {
                     ...first,
@@ -429,20 +472,18 @@ function getCascadeConflicts(css) {
                     reason = `${winner.selector} wins because it appears later in the source order.`;
                 }
 
-                const description = [
-                    `Property: ${property}.`,
-                    `Values: ${firstDeclaration.value} / ${secondDeclaration.value}.`,
-                    `Likely winner: ${winner.selector}.`,
-                    `Specificity: ${first.selector} (${formatSpecificity(first.specificity)}) / ${second.selector} (${formatSpecificity(second.specificity)}).`,
-                    `Reason: ${reason}`
-                ].join(" ");
-
                 conflicts.push({
                     type: "cascade-conflict",
                     severity: "warning",
                     selector: `${first.selector} / ${second.selector}`,
                     title: "Potential cascade conflict",
-                    description
+                    description: [
+                        `Property: ${property}.`,
+                        `Values: ${firstDeclaration.value} / ${secondDeclaration.value}.`,
+                        `Likely winner: ${winner.selector}.`,
+                        `Specificity: ${first.selector} (${formatSpecificity(first.specificity)}) / ${second.selector} (${formatSpecificity(second.specificity)}).`,
+                        `Reason: ${reason}`
+                    ].join(" ")
                 });
             });
         }
@@ -455,30 +496,67 @@ function getCascadeConflicts(css) {
 function getCSSVariableIssues(css) {
     const cleanCSS = css.replace(/\/\*[\s\S]*?\*\//g, "");
     const declaredVariables = new Set();
-    const usedVariables = new Set();
+    const usedVariables = new Map();
 
-    const declarations = cleanCSS.match(/[^{};]+:[^;{}]+/g) || [];
-
-    declarations.forEach((declaration) => {
-        const colon = declaration.indexOf(":");
-        const property = declaration.substring(0, colon).trim();
-
-        if (property.startsWith("--")) {
-            declaredVariables.add(property);
-        }
+    getCSSRules(cleanCSS).forEach((rule) => {
+        rule.declarationList.forEach((declaration) => {
+            if (declaration.property.startsWith("--")) {
+                declaredVariables.add(declaration.property);
+            }
+        });
     });
 
-    const variableRegex = /var\(\s*(--[\w-]+)/g;
-    let match;
+    for (let i = 0; i < cleanCSS.length; i++) {
+        if (cleanCSS.slice(i, i + 4).toLowerCase() !== "var(") {
+            continue;
+        }
 
-    while ((match = variableRegex.exec(cleanCSS)) !== null) {
-        usedVariables.add(match[1]);
+        let depth = 1;
+        let end = i + 4;
+        let quote = "";
+
+        while (end < cleanCSS.length && depth > 0) {
+            const character = cleanCSS[end];
+
+            if (quote) {
+                if (character === quote && cleanCSS[end - 1] !== "\\") {
+                    quote = "";
+                }
+            } else if (character === "'" || character === '"') {
+                quote = character;
+            } else if (character === "(") {
+                depth++;
+            } else if (character === ")") {
+                depth--;
+            }
+
+            end++;
+        }
+
+        if (depth !== 0) continue;
+
+        const content = cleanCSS.substring(i + 4, end - 1);
+        const parts = splitTopLevel(content, ",");
+
+        const variable = parts[0]?.trim();
+        const hasFallback = parts.length > 1 &&
+            parts.slice(1).join(",").trim().length > 0;
+
+        if (!variable || !variable.startsWith("--")) continue;
+
+        if (!usedVariables.has(variable)) {
+            usedVariables.set(variable, false);
+        }
+
+        if (!hasFallback) {
+            usedVariables.set(variable, true);
+        }
     }
 
     const issues = [];
 
-    usedVariables.forEach((variable) => {
-        if (!declaredVariables.has(variable)) {
+    usedVariables.forEach((needsDeclaration, variable) => {
+        if (needsDeclaration && !declaredVariables.has(variable)) {
             issues.push({
                 type: "undefined-variable",
                 severity: "warning",
@@ -487,6 +565,34 @@ function getCSSVariableIssues(css) {
                 description: `The variable "${variable}" is used but no declaration was found.`
             });
         }
+    });
+
+    return issues;
+}
+
+// Find important overuse
+function getCSSImportantIssues(css) {
+    const issues = [];
+    const rules = getCSSRules(css);
+
+    rules.forEach((rule) => {
+        const importantDeclarations = rule.declarationList.filter(
+            declaration => declaration.important
+        );
+
+        if (importantDeclarations.length < 2) return;
+
+        const properties = importantDeclarations.map(
+            declaration => declaration.property
+        );
+
+        issues.push({
+            type: "important-overuse",
+            severity: "warning",
+            selector: rule.selector,
+            title: "Excessive !important usage",
+            description: `This rule uses !important ${importantDeclarations.length} times (${properties.join(", ")}). Consider reviewing the cascade and selector specificity.`
+        });
     });
 
     return issues;
@@ -573,7 +679,7 @@ function getCSSIssues(css) {
     });
 
     rules.forEach((rule) => {
-        if (!Object.keys(rule.declarations).length) {
+        if (!rule.declarationList.length) {
             issues.push({
                 type: "empty-rule",
                 severity: "warning",
@@ -584,11 +690,15 @@ function getCSSIssues(css) {
         }
     });
 
-    getCascadeConflicts(css).forEach((conflict) => {
-        issues.push(conflict);
+    getCascadeConflicts(css).forEach((issue) => {
+        issues.push(issue);
     });
 
     getCSSVariableIssues(css).forEach((issue) => {
+        issues.push(issue);
+    });
+
+    getCSSImportantIssues(css).forEach((issue) => {
         issues.push(issue);
     });
 
@@ -605,6 +715,7 @@ function getCSSIssues(css) {
     return issues;
 }
 
+// Exports
 export {
     getSelectors,
     getDuplicateSelectors,
@@ -616,5 +727,6 @@ export {
     calculateSelectorSpecificity,
     compareSpecificity,
     selectorsCanMatchSameElement,
-    getCSSVariableIssues
+    getCSSVariableIssues,
+    getCSSImportantIssues
 };
