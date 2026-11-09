@@ -1,159 +1,435 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CascadeX - CSS Analyzer</title>
-    <link rel="stylesheet" href="./css/style.css" />
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CascadeX — CSS Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <!-- Intro -->
+    <div class="intro-screen" aria-hidden="true">
+        <div class="intro-content">
+            <div class="intro-logo">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <h1>Cascade<span>X</span></h1>
+            <p>Understand your CSS.</p>
+        </div>
+    </div>
+
     <div class="app">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="logo">CascadeX</div>
 
-        <nav>
-          <a href="#dashboard" class="nav-link active">Dashboard</a>
-          <a href="#analyzer" class="nav-link">CSS Analyzer</a>
-          <a href="#results-section" class="nav-link">Results</a>
-          <a href="#history" class="nav-link">History</a>
-        </nav>
+        <!-- Sidebar -->
+        <aside class="sidebar">
 
-        <div class="sidebar-bottom">CSS Analysis Tool</div>
-      </aside>
+            <a href="#dashboard" class="brand">
+                <div class="brand-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
 
-      <!-- Main Content -->
-      <main class="main-content">
-        <!-- Header -->
-        <header class="topbar">
-          <div>
-            <p class="breadcrumb">Dashboard / Overview</p>
-            <h1>Dashboard</h1>
-          </div>
+                <span>Cascade<span class="brand-x">X</span></span>
+            </a>
 
-          <button id="theme-toggle" class="theme-button">Toggle Theme</button>
-        </header>
+            <div class="nav-group">
+                <p class="nav-label">WORKSPACE</p>
 
-        <!-- Welcome -->
-        <section class="welcome" id="dashboard">
-          <h2>Welcome to CascadeX</h2>
-          <div id="warnings-section" class="warnings-section" hidden>
-            <h3>CSS Syntax Warnings</h3>
-            <ul id="warnings-list"></ul>
-          </div>
-          <p>
-            Analyze your CSS selectors, find duplicates and check specificity.
-          </p>
-        </section>
+                <nav>
+                    <a href="#dashboard" class="nav-link active">
+                        <span class="nav-icon">◫</span>
+                        Dashboard
+                    </a>
 
-        <!-- Summary -->
-        <section id="analysis-summary" class="stats" hidden>
-          <div class="stat-card">
-            <p>Total Selectors</p>
-            <h3 id="total-selectors">0</h3>
-          </div>
+                    <a href="#analyzer" class="nav-link">
+                        <span class="nav-icon">⌘</span>
+                        CSS Analyzer
+                    </a>
 
-          <div class="stat-card">
-            <p>Duplicate Selectors</p>
-            <h3 id="total-duplicates">0</h3>
-          </div>
+                    <a href="#results-section" class="nav-link">
+                        <span class="nav-icon">◎</span>
+                        Analysis Results
+                    </a>
 
-          <div class="stat-card">
-            <p>Unique Selectors</p>
-            <h3 id="total-unique">0</h3>
-          </div>
-        </section>
-
-        <!-- Analyzer -->
-        <section class="analyzer" id="analyzer">
-          <div class="section-heading">
-            <h2>CSS Analyzer</h2>
-            <p>Paste your CSS code below to analyze it.</p>
-          </div>
-
-          <div class="editor-card">
-            <div class="editor-header">
-              <label for="css-input">CSS Editor</label>
-              <span id="char-count">0 characters</span>
+                    <a href="#history" class="nav-link">
+                        <span class="nav-icon">↺</span>
+                        History
+                    </a>
+                </nav>
             </div>
 
-            <textarea
-              id="css-input"
-              placeholder="Paste your CSS code here..."
-            ></textarea>
-
-            <div class="editor-footer">
-              <div class="file-actions">
-                <label for="css-file" class="file-button"> Upload CSS </label>
-                <input
-                  type="file"
-                  id="css-file"
-                  accept=".css,text/css"
-                  hidden
-                />
-                <span id="file-name">No file selected</span>
-              </div>
-
-              <div class="action-buttons">
-                <button id="clear-button" class="secondary-button">
-                  Clear
-                </button>
-
-                <button id="analyze-button" class="primary-button">
-                  Analyze CSS
-                </button>
-
-                <button id="export-report" class="secondary-button" disabled>
-                  Export Report
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Results -->
-        <section id="results-section" class="results-section" hidden>
-          <h2>Analysis Results</h2>
-
-          <div id="results-placeholder" class="results-placeholder" hidden>
-            <h3>No Results Yet</h3>
-            <p>Analyze your CSS to see the results here.</p>
-          </div>
-
-          <div id="results-list">
-            <div class="result-header">
-              <span>Selector</span>
-              <span>Specificity</span>
-              <span>Status</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- History -->
-        <section id="history" class="history-section">
-          <div class="history-heading">
-            <div>
-              <h2>Analysis History</h2>
-              <p>View your previous CSS analyses.</p>
+            <div class="sidebar-card">
+                <div class="sidebar-card-icon">✳</div>
+                <p class="sidebar-card-title">CSS, understood.</p>
+                <p class="sidebar-card-text">
+                    Find conflicts. Understand the cascade. Write better styles.
+                </p>
             </div>
 
-            <button id="clear-history" class="secondary-button">
-              Clear History
-            </button>
-          </div>
+            <div class="sidebar-bottom">
+                <span class="status-dot"></span>
+                Local workspace
+                <span class="version">v0.1</span>
+            </div>
 
-          <div id="history-list">
-            <p class="history-empty">No analysis history yet.</p>
-          </div>
-        </section>
+        </aside>
 
-        <!-- Footer -->
-        <footer class="footer">
-          <p>© 2026 CascadeX. CSS Analysis Tool.</p>
-        </footer>
-      </main>
+        <!-- Main -->
+        <main class="main-content">
+
+            <!-- Header -->
+            <header class="topbar">
+
+                <div class="breadcrumb">
+                    <span>Workspace</span>
+                    <span>/</span>
+                    <strong>Overview</strong>
+                </div>
+
+                <div class="topbar-actions">
+                    <span class="local-label">
+                        <span class="status-dot"></span>
+                        Ready to analyze
+                    </span>
+
+                    <button id="theme-toggle" class="theme-button">
+                        ◐ <span>Theme</span>
+                    </button>
+                </div>
+
+            </header>
+
+            <!-- Dashboard -->
+            <section class="welcome" id="dashboard">
+
+                <div class="welcome-content">
+                    <p class="eyebrow">YOUR CSS WORKSPACE</p>
+
+                    <h1>Make sense of<br>your <span>styles.</span></h1>
+
+                    <p class="welcome-description">
+                        Understand what your CSS is doing.
+                        Find repeated selectors, inspect specificity
+                        and identify potential problems.
+                    </p>
+
+                    <a href="#analyzer" class="welcome-link">
+                        Start analyzing <span>↗</span>
+                    </a>
+                </div>
+
+                <div class="welcome-art">
+                    <div class="art-caption">THE CASCADE</div>
+
+                    <div class="cascade-visual">
+                        <div class="cascade-layer layer-one">
+                            <span>01</span>
+                            <div></div>
+                        </div>
+
+                        <div class="cascade-layer layer-two">
+                            <span>02</span>
+                            <div></div>
+                        </div>
+
+                        <div class="cascade-layer layer-three">
+                            <span>03</span>
+                            <div></div>
+                        </div>
+
+                        <div class="cascade-connector"></div>
+                        <div class="cascade-result">
+                            <span>↓</span>
+                            <strong>ONE RESULT</strong>
+                        </div>
+                    </div>
+
+                    <p class="art-footer">RULES · PRIORITY · SPECIFICITY</p>
+                </div>
+
+            </section>
+
+            <!-- Warnings -->
+            <section id="warnings-section" class="warnings-section" hidden>
+                <div class="section-title">
+                    <span class="section-indicator warning-indicator"></span>
+                    <h3>CSS Syntax Warnings</h3>
+                </div>
+
+                <ul id="warnings-list"></ul>
+            </section>
+
+            <!-- Summary -->
+            <section id="analysis-summary" class="stats" hidden>
+
+                <div class="stat-card">
+                    <span class="stat-label">TOTAL SELECTORS</span>
+                    <h3 id="total-selectors">0</h3>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">DUPLICATE SELECTORS</span>
+                    <h3 id="total-duplicates">0</h3>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">UNIQUE SELECTORS</span>
+                    <h3 id="total-unique">0</h3>
+                </div>
+
+            </section>
+
+            <!-- Workspace -->
+            <section class="workspace-section" id="analyzer">
+
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">ANALYSIS WORKSPACE</p>
+                        <h2>Inspect your stylesheet</h2>
+                        <p>Paste your CSS or upload a stylesheet to begin.</p>
+                    </div>
+
+                    <span class="workspace-number">01 / EDITOR</span>
+                </div>
+
+                <div class="workspace-grid">
+
+                    <!-- Editor -->
+                    <div class="editor-card">
+
+                        <div class="editor-header">
+                            <div class="editor-file">
+                                <span class="file-dot"></span>
+                                <label for="css-input">stylesheet.css</label>
+                            </div>
+
+                            <span id="char-count">0 characters</span>
+                        </div>
+
+                        <div class="editor-body">
+                            <div id="editor-gutter" class="editor-gutter" aria-hidden="true">
+                                <div id="editor-line-numbers" class="editor-line-numbers"></div>
+                            </div>
+
+                            <div class="editor-code-area">
+                                <pre id="css-highlight" class="css-highlight" aria-hidden="true"><code id="css-highlight-code"></code></pre>
+                                <textarea
+                                    id="css-input"
+                                    spellcheck="false"
+                                    wrap="off"
+                                    placeholder="/* Paste your CSS here */
+
+.container {
+    display: flex;
+    padding: 20px;
+}
+
+.title {
+    color: #333;
+}
+
+/* Start analyzing your styles... */"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div class="editor-footer">
+
+                            <div class="file-actions">
+                                <label for="css-file" class="file-button">
+                                    ↑ Upload CSS
+                                </label>
+
+                                <input
+                                    type="file"
+                                    id="css-file"
+                                    accept=".css,text/css"
+                                    hidden
+                                >
+
+                                <span id="file-name">No file selected</span>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button id="clear-button" class="secondary-button">
+                                    Clear
+                                </button>
+
+                                <button id="analyze-button" class="primary-button">
+                                    Analyze CSS <span>→</span>
+                                </button>
+
+                                <button id="export-report" class="secondary-button" disabled>
+                                    Export
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Side Panel -->
+                    <aside class="workspace-aside">
+
+                        <div class="aside-card">
+                            <p class="aside-label">QUICK GUIDE</p>
+
+                            <h3>What can you find?</h3>
+
+                            <div class="guide-item">
+                                <span class="guide-number">01</span>
+                                <div>
+                                    <strong>Duplicate selectors</strong>
+                                    <p>Find selectors repeated across your stylesheet.</p>
+                                </div>
+                            </div>
+
+                            <div class="guide-item">
+                                <span class="guide-number">02</span>
+                                <div>
+                                    <strong>Specificity scores</strong>
+                                    <p>Understand selector priority and weight.</p>
+                                </div>
+                            </div>
+
+                            <div class="guide-item">
+                                <span class="guide-number">03</span>
+                                <div>
+                                    <strong>Syntax warnings</strong>
+                                    <p>Spot potential CSS syntax problems.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="aside-note">
+                            <span class="note-icon">✳</span>
+                            <div>
+                                <strong>A small reminder</strong>
+                                <p>
+                                    Higher specificity doesn't always mean
+                                    better CSS. Keep your selectors simple.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="shortcut-card">
+                            <span>WORKSPACE TIP</span>
+                            <p>Keep your CSS organized and avoid unnecessary selector repetition.</p>
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </section>
+
+            <!-- Results -->
+            <section id="results-section" class="results-section" hidden>
+
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">YOUR ANALYSIS</p>
+                        <h2>Analysis results</h2>
+                        <p>Filter, search and inspect the issues found in your stylesheet.</p>
+                    </div>
+
+                    <span class="workspace-number">02 / REPORT</span>
+                </div>
+
+                <div class="results-counts" aria-label="Issue counts">
+                    <button class="result-count-card active" type="button" data-filter="all" aria-pressed="true">
+                        <span>ALL ISSUES</span>
+                        <strong id="result-count-all">0</strong>
+                    </button>
+
+                    <button class="result-count-card" type="button" data-filter="error" aria-pressed="false">
+                        <span>ERRORS</span>
+                        <strong id="result-count-error">0</strong>
+                    </button>
+
+                    <button class="result-count-card" type="button" data-filter="warning" aria-pressed="false">
+                        <span>WARNINGS</span>
+                        <strong id="result-count-warning">0</strong>
+                    </button>
+
+                    <button class="result-count-card" type="button" data-filter="info" aria-pressed="false">
+                        <span>INFO</span>
+                        <strong id="result-count-info">0</strong>
+                    </button>
+                </div>
+
+                <div class="results-toolbar">
+                    <label class="result-search">
+                        <span>Search issues</span>
+                        <input id="results-search" type="search" placeholder="Search by issue, selector or explanation">
+                    </label>
+
+                    <label class="result-sort">
+                        <span>Sort by</span>
+                        <select id="results-sort">
+                            <option value="severity">Severity</option>
+                            <option value="selector">Selector A–Z</option>
+                            <option value="title">Issue A–Z</option>
+                        </select>
+                    </label>
+
+                    <span id="results-visible-count" class="results-visible-count">0 issues</span>
+                </div>
+
+                <div id="results-placeholder" class="results-placeholder" hidden>
+                    <h3>No matching issues</h3>
+                    <p>Try another filter or search term.</p>
+                </div>
+
+                <div id="results-list" class="results-list"></div>
+
+            </section>
+
+            <!-- History -->
+            <section id="history" class="history-section">
+
+                <div class="section-heading history-heading">
+                    <div>
+                        <p class="eyebrow">YOUR ACTIVITY</p>
+                        <h2>Recent analyses</h2>
+                        <p>Pick up where you left off.</p>
+                    </div>
+
+                    <button id="clear-history" class="secondary-button">
+                        Clear history
+                    </button>
+                </div>
+
+                <div id="history-list">
+                    <p class="history-empty">No analysis history yet.</p>
+                </div>
+
+            </section>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <span>CASCADEX</span>
+                <p>Built to make CSS less confusing.</p>
+                <span>2026</span>
+            </footer>
+
+        </main>
+
     </div>
 
     <script type="module" src="./js/app.js"></script>
-  </body>
+
+</body>
 </html>
