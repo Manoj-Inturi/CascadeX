@@ -451,6 +451,47 @@ function getCascadeConflicts(css) {
     return conflicts;
 }
 
+// Find CSS variables
+function getCSSVariableIssues(css) {
+    const cleanCSS = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    const declaredVariables = new Set();
+    const usedVariables = new Set();
+
+    const declarations = cleanCSS.match(/[^{};]+:[^;{}]+/g) || [];
+
+    declarations.forEach((declaration) => {
+        const colon = declaration.indexOf(":");
+        const property = declaration.substring(0, colon).trim();
+
+        if (property.startsWith("--")) {
+            declaredVariables.add(property);
+        }
+    });
+
+    const variableRegex = /var\(\s*(--[\w-]+)/g;
+    let match;
+
+    while ((match = variableRegex.exec(cleanCSS)) !== null) {
+        usedVariables.add(match[1]);
+    }
+
+    const issues = [];
+
+    usedVariables.forEach((variable) => {
+        if (!declaredVariables.has(variable)) {
+            issues.push({
+                type: "undefined-variable",
+                severity: "warning",
+                selector: "",
+                title: "Undefined CSS variable",
+                description: `The variable "${variable}" is used but no declaration was found.`
+            });
+        }
+    });
+
+    return issues;
+}
+
 // Find CSS issues
 function getCSSIssues(css) {
     const issues = [];
@@ -547,6 +588,10 @@ function getCSSIssues(css) {
         issues.push(conflict);
     });
 
+    getCSSVariableIssues(css).forEach((issue) => {
+        issues.push(issue);
+    });
+
     getCSSWarnings(css).forEach((warning) => {
         issues.push({
             type: "syntax-warning",
@@ -570,5 +615,6 @@ export {
     getCSSIssues,
     calculateSelectorSpecificity,
     compareSpecificity,
-    selectorsCanMatchSameElement
+    selectorsCanMatchSameElement,
+    getCSSVariableIssues
 };
