@@ -29,8 +29,16 @@ const resultCountError = document.getElementById("result-count-error");
 const resultCountWarning = document.getElementById("result-count-warning");
 const resultCountInfo = document.getElementById("result-count-info");
 const resultFilterButtons = document.querySelectorAll(".result-count-card");
+const generateCSSButton = document.getElementById("generate-css");
+const generatedCSSPanel = document.getElementById("generated-css-panel");
+const generatedCSSOutput = document.getElementById("generated-css-output");
+const copyGeneratedCSSButton = document.getElementById("copy-generated-css");
+const resetGeneratedCSSButton = document.getElementById("reset-generated-css");
 
 let latestReport = [];
+let originalCSS = "";
+let selectedFixes = new Map();
+let fixGroups = new Map();
 let activeFilter = "all";
 
 // Load theme
@@ -60,6 +68,13 @@ function resetResults() {
     resultsSection.hidden = true;
     analysisSummary.hidden = true;
     resultsList.innerHTML = "";
+    selectedFixes.clear();
+    fixGroups.clear();
+    generatedCSSPanel.hidden = true;
+    generatedCSSOutput.value = "";
+    generateCSSButton.disabled = true;
+    const selectedCount = document.getElementById("selected-fix-count");
+    if (selectedCount) selectedCount.textContent = "0 selected";
     resultsSearch.value = "";
     activeFilter = "all";
     updateActiveFilter();
@@ -221,6 +236,299 @@ function updateActiveFilter() {
     });
 }
 
+// Read CSS rule and declaration source ranges
+function readCSSDeclarations(css) {
+    const rules = [];
+    let i = 0;
+    let order = 0;
+
+    while (i < css.length) {
+        while (i < css.length && /\s/.test(css[i])) i++;
+        if (i >= css.length) break;
+
+        if (css.startsWith("/*", i)) {
+            const end = css.indexOf("*/", i + 2);
+            i = end === -1 ? css.length : end + 2;
+            continue;
+        }
+
+        const preludeStart = i;
+        let quote = "";
+        let round = 0;
+        let square = 0;
+
+        while (i < css.length) {
+            const ch = css[i];
+            if (quote) {
+                if (ch === quote && css[i - 1] !== "\\\\") quote = "";
+            } else if (ch === "'" || ch === '"') {
+                quote = ch;
+            } else if (ch === "(") round++;
+            else if (ch === ")") round--;
+            else if (ch === "[") square++;
+            else if (ch === "]") square--;
+            else if (ch === "{" && round === 0 && square === 0) break;
+            else if (ch === ";" && round === 0 && square === 0) break;
+            i++;
+        }
+
+        if (css[i] !== "{") {
+            i++;
+            continue;
+        }
+
+        const selector = css.slice(preludeStart, i).trim();
+        const bodyStart = i + 1;
+        let depth = 1;
+        quote = "";
+        i++;
+
+        while (i < css.length && depth > 0) {
+            const ch = css[i];
+            if (quote) {
+                if (ch === quote && css[i - 1] !== "\\\\") quote = "";
+            } else if (ch === "'" || ch === '"') {
+                quote = ch;
+            } else if (css.startsWith("/*", i)) {
+                const end = css.indexOf("*/", i + 2);
+                i = end === -1 ? css.length : end + 1;
+            } else if (ch === "{") depth++;
+            else if (ch === "}") depth--;
+            i++;
+        }
+
+        const bodyEnd = depth === 0 ? i - 1 : css.length;
+        const body = css.slice(bodyStart, bodyEnd);
+
+        if (!selector.startsWith("@")) {
+            let start = bodyStart;
+            let local = 0;
+            let parens = 0;
+            let brackets = 0;
+            let declarationQuote = "";
+
+            while (local <= body.length) {
+                const ch = body[local];
+
+                if (declarationQuote) {
+                    if (ch === declarationQuote && body[local - 1] !== "\\\\") declarationQuote = "";
+                } else if (ch === "'" || ch === '"') {
+                    declarationQuote = ch;
+                } else if (ch === "(") parens++;
+                else if (ch === ")") parens--;
+                else if (ch === "[") brackets++;
+                else if (ch === "]") brackets--;
+                else if ((ch === ";" || local === body.length) && parens === 0 && brackets === 0) {
+                    const rawStart = start;
+                    const rawEnd = bodyStart + local;
+                    const raw = css.slice(rawStart, rawEnd);
+                    const colon = raw.indexOf(":");
+
+                    if (colon !== -1) {
+                        const property = raw.slice(0, colon).trim();
+                        const valueRaw = raw.slice(colon + 1).trim();
+                        const value = valueRaw.replace(/!\s*important\s*$/i, "").trim();
+
+                        if (property && value && /^--[\w-]+$|^-?[a-zA-Z_][\w-]*$/.test(property)) {
+                            rules.push({
+                                selector,
+                                property,
+                                value,
+                                important: /!\s*important\s*$/i.test(valueRaw),
+                                start: rawStart,
+                                end: rawEnd,
+                                order: order++
+                            });
+                        }
+                    }
+
+                    start = bodyStart + local + 1;
+                }
+
+                local++;
+            }
+        }
+    }
+
+    return rules;
+}
+
+// Build selectable choices for supported warnings
+function getFixGroup(issue, css) {
+    if (issue.severity !== "warning") return null;
+
+    const declarations = readCSSDeclarations(css);
+    const selectorText = issue.selector || "";
+    let candidates = [];
+
+    if (issue.type === "duplicate-declaration") {
+        const property = issue.description.match(/^\s*([-\w]+)\s*:/)?.[1];
+        if (!property) return null;
+
+        candidates = declarations.filter(item =>
+            item.selector === selectorText && item.property === property
+        );
+    } else if (issue.type === "repeated-selector") {
+        const properties = [...issue.description.matchAll(/([-\w]+):\s*([^|.]+?)(?=\s*\||$)/g)]
+            .map(match => ({ property: match[1], values: match[2].split("→").map(value => value.trim()) }));
+
+        properties.forEach(({ property, values }) => {
+            const matches = declarations.filter(item =>
+                item.selector === selectorText &&
+                item.property === property &&
+                values.includes(item.value)
+            );
+            if (matches.length > 1) {
+                candidates.push(...matches);
+            }
+        });
+
+        if (candidates.length === 0) {
+            const matchingRules = declarations.filter(item => item.selector === selectorText);
+            const propertyMap = new Map();
+            matchingRules.forEach(item => {
+                if (!propertyMap.has(item.property)) propertyMap.set(item.property, []);
+                propertyMap.get(item.property).push(item);
+            });
+            propertyMap.forEach(items => {
+                if (new Set(items.map(item => item.value)).size > 1) candidates.push(...items);
+            });
+        }
+    } else if (issue.type === "cascade-conflict") {
+        const property = issue.description.match(/Property:\s*([-\w]+)/i)?.[1];
+        const values = issue.description.match(/Values:\s*(.*?)\./i)?.[1]
+            ?.split("/")
+            .map(value => value.trim()) || [];
+        const selectors = selectorText.split(" / ").map(value => value.trim());
+
+        candidates = declarations.filter(item =>
+            selectors.includes(item.selector) &&
+            item.property === property &&
+            values.includes(item.value)
+        );
+    }
+
+    const unique = [...new Map(candidates.map(item => [`${item.start}:${item.end}`, item])).values()];
+    if (unique.length < 2) return null;
+
+    return {
+        id: `${issue.type}:${issue.selector}:${issue.description}`,
+        title: issue.title,
+        declarations: unique
+    };
+}
+
+// Render choices inside an issue
+function renderFixChoices(issue, details) {
+    const group = getFixGroup(issue, originalCSS);
+    if (!group) return;
+
+    fixGroups.set(group.id, group);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "fix-choice-panel";
+
+    const heading = document.createElement("strong");
+    heading.className = "fix-choice-heading";
+    heading.textContent = "Choose the declaration to keep";
+
+    const hint = document.createElement("p");
+    hint.className = "fix-choice-hint";
+    hint.textContent = "No selection means the original CSS stays unchanged.";
+
+    const options = document.createElement("div");
+    options.className = "fix-choice-options";
+
+    group.declarations.forEach((declaration, optionIndex) => {
+        const label = document.createElement("label");
+        label.className = "fix-choice-option";
+
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = `fix-${group.id}`;
+        radio.value = String(optionIndex);
+        radio.checked = selectedFixes.get(group.id) === optionIndex;
+
+        const code = document.createElement("code");
+        code.textContent = `${declaration.selector} { ${declaration.property}: ${declaration.value}${declaration.important ? " !important" : ""}; }`;
+
+        radio.addEventListener("change", () => {
+            selectedFixes.set(group.id, optionIndex);
+            updateFixSelectionCount();
+        });
+
+        label.append(radio, code);
+        options.appendChild(label);
+    });
+
+    wrapper.append(heading, hint, options);
+    details.appendChild(wrapper);
+}
+
+// Count selected fixes
+function updateFixSelectionCount() {
+    const count = document.getElementById("selected-fix-count");
+    if (count) count.textContent = `${selectedFixes.size} selected`;
+    if (generateCSSButton) generateCSSButton.disabled = selectedFixes.size === 0;
+}
+
+// Generate complete CSS with selected declarations retained
+function generateUpdatedCSS() {
+    if (selectedFixes.size === 0) return;
+
+    const removals = [];
+
+    selectedFixes.forEach((selectedIndex, groupId) => {
+        const group = fixGroups.get(groupId);
+        if (!group) return;
+
+        group.declarations.forEach((declaration, index) => {
+            if (index !== selectedIndex) {
+                removals.push({ start: declaration.start, end: declaration.end });
+            }
+        });
+    });
+
+    const uniqueRemovals = [...new Map(
+        removals.map(item => [`${item.start}:${item.end}`, item])
+    ).values()].sort((a, b) => b.start - a.start);
+
+    let output = originalCSS;
+    uniqueRemovals.forEach(range => {
+        output = output.slice(0, range.start) + output.slice(range.end);
+    });
+
+    generatedCSSOutput.value = output;
+    generatedCSSPanel.hidden = false;
+    generatedCSSPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+// Copy generated CSS
+copyGeneratedCSSButton.addEventListener("click", async () => {
+    if (!generatedCSSOutput.value) return;
+
+    try {
+        await navigator.clipboard.writeText(generatedCSSOutput.value);
+        copyGeneratedCSSButton.textContent = "Copied!";
+        setTimeout(() => {
+            copyGeneratedCSSButton.textContent = "Copy complete CSS";
+        }, 1600);
+    } catch {
+        generatedCSSOutput.focus();
+        generatedCSSOutput.select();
+        document.execCommand("copy");
+        copyGeneratedCSSButton.textContent = "Copied!";
+    }
+});
+
+// Reset generated output
+resetGeneratedCSSButton.addEventListener("click", () => {
+    generatedCSSPanel.hidden = true;
+    generatedCSSOutput.value = "";
+});
+
+generateCSSButton.addEventListener("click", generateUpdatedCSS);
+
 // Create issue card
 function createIssueCard(issue, index) {
     const category = getIssueCategory(issue);
@@ -272,6 +580,7 @@ function createIssueCard(issue, index) {
     type.textContent = (issue.type || "css-issue").replaceAll("-", " ");
 
     details.append(description, type);
+    renderFixChoices(issue, details);
 
     toggle.addEventListener("click", () => {
         const expanded = toggle.getAttribute("aria-expanded") === "true";
@@ -371,6 +680,12 @@ analyzeButton.addEventListener("click", () => {
         return;
     }
 
+    originalCSS = cssInput.value;
+    selectedFixes.clear();
+    fixGroups.clear();
+    generatedCSSPanel.hidden = true;
+    generatedCSSOutput.value = "";
+
     const selectors = getSelectors(css);
     const duplicates = getDuplicateSelectors(css);
     const issues = getCSSIssues(css);
@@ -408,6 +723,7 @@ analyzeButton.addEventListener("click", () => {
 
     updateActiveFilter();
     renderResults();
+    updateFixSelectionCount();
     saveHistory(css, selectors.length, duplicateSet.size);
 });
 
