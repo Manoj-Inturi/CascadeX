@@ -1284,6 +1284,16 @@ function getCSSIssues(css) {
     getCSSImportantIssues(css).forEach(issue => issues.push(issue));
     getFragileCSSIssues(css).forEach(issue => issues.push(issue));
 
+    if (/:where\s*\(/i.test(css)) {
+        issues.push({
+            type: "specificity-information",
+            severity: "info",
+            selector: ":where()",
+            title: ":where() contributes zero specificity",
+            description: "Selectors inside :where() do not add specificity. This can make styles easier to override, even when the selector contains IDs or classes."
+        });
+    }
+
     getCSSWarnings(css).forEach(warning => {
         issues.push({
             type: "syntax-warning",
