@@ -395,6 +395,30 @@
 
                 <div id="results-list" class="results-list"></div>
 
+                <div class="fix-generator-toolbar">
+                    <div>
+                        <strong>CSS Fix Assistant</strong>
+                        <p>Choose the declarations you want to keep, then generate your updated stylesheet.</p>
+                    </div>
+                    <span id="selected-fix-count" class="selected-fix-count">0 selected</span>
+                    <button id="generate-css" class="primary-button" type="button" disabled>Generate updated CSS</button>
+                </div>
+
+                <section id="generated-css-panel" class="generated-css-panel" hidden>
+                    <div class="generated-css-heading">
+                        <div>
+                            <p class="eyebrow">YOUR UPDATED STYLESHEET</p>
+                            <h3>Generated CSS</h3>
+                            <p>Only selected fixes are applied. Unselected code remains unchanged.</p>
+                        </div>
+                        <div class="generated-css-actions">
+                            <button id="reset-generated-css" class="secondary-button" type="button">Close</button>
+                            <button id="copy-generated-css" class="primary-button" type="button">Copy complete CSS</button>
+                        </div>
+                    </div>
+                    <textarea id="generated-css-output" class="generated-css-output" spellcheck="false" readonly aria-label="Generated CSS"></textarea>
+                </section>
+
             </section>
 
             <!-- History -->
