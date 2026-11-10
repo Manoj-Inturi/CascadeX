@@ -191,6 +191,22 @@
 
             </section>
 
+            <!-- Phase 4: multi-file ZIP workspace -->
+            <section class="zip-workspace-section" id="zip-analyzer">
+                <div class="section-heading"><div><p class="eyebrow">MULTI-FILE WORKSPACE · PHASE 4</p><h2>Analyze an entire project</h2><p>Upload a website ZIP to inspect each CSS file and export selected fixes.</p></div><span class="workspace-number">ZIP / PROJECT</span></div>
+                <div class="zip-upload-card">
+                    <div class="zip-upload-copy"><div class="zip-upload-icon">ZIP</div><div><strong>Upload your project ZIP</strong><p>CSS files are discovered recursively. Other files and folders are preserved.</p></div></div>
+                    <input id="project-zip-input" type="file" accept=".zip,application/zip" hidden>
+                    <div class="zip-upload-actions"><button id="zip-browse" class="secondary-button" type="button">Choose ZIP</button><button id="zip-analyze" class="primary-button" type="button" disabled>Scan ZIP →</button></div>
+                    <p id="zip-status" class="zip-status" role="status">Upload a ZIP containing your website's CSS files.</p>
+                </div>
+                <section id="zip-files-panel" class="zip-files-panel" hidden>
+                    <div class="zip-files-heading"><div><p class="eyebrow">PROJECT REPORT</p><h3>CSS files and issues</h3><p id="zip-summary" class="zip-summary"></p></div><div class="zip-files-actions"><button id="zip-clear" class="secondary-button" type="button">Clear</button><button id="zip-generate" class="primary-button" type="button" disabled>Generate fixed ZIP</button></div></div>
+                    <div id="zip-files-list" class="zip-files-list"></div>
+                    <p class="zip-preserve-note">Only selected supported fixes are applied. Unselected declarations and non-CSS files remain unchanged. The original ZIP is never overwritten.</p>
+                </section>
+            </section>
+
             <!-- Workspace -->
             <section class="workspace-section" id="analyzer">
 
@@ -453,7 +469,9 @@
 
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script type="module" src="./js/app.js"></script>
+    <script type="module" src="./js/zip-workspace.js"></script>
 
 </body>
 </html>
