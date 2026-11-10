@@ -1907,3 +1907,44 @@ button:disabled {
     .generated-css-actions { width: 100%; }
     .generated-css-actions button { flex: 1; }
 }
+
+
+/* Phase 4 — multi-file ZIP workspace */
+.zip-workspace-section { margin: 0 0 52px; }
+.zip-upload-card, .zip-files-panel { padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.zip-upload-card { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 16px; align-items: center; }
+.zip-upload-copy { display: flex; align-items: center; gap: 14px; }
+.zip-upload-copy strong { color: var(--text); font-size: 14px; }
+.zip-upload-copy p, .zip-files-heading > div > p:last-child { margin-top: 5px; color: var(--text-light); font-size: 12px; line-height: 1.6; }
+.zip-upload-icon { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px; border-radius: 9px; background: var(--surface-soft); color: var(--text); font: 700 13px 'DM Mono', monospace; }
+.zip-upload-actions, .zip-files-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.zip-status { grid-column: 1 / -1; margin: 0; color: var(--text-light); font-size: 11px; }
+.zip-status-error { color: #dc5757; }
+.zip-files-panel { margin-top: 16px; }
+.zip-files-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.zip-files-heading h3 { margin-top: 5px; color: var(--text); font: 700 18px Manrope, sans-serif; }
+.zip-summary { font-family: 'DM Mono', monospace; font-size: 10px !important; }
+.zip-files-list { display: grid; gap: 9px; }
+.zip-file-card, .zip-issue-card { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.zip-file-summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; list-style: none; }
+.zip-file-summary::-webkit-details-marker, .zip-issue-card > summary::-webkit-details-marker { display: none; }
+.zip-file-name { min-width: 0; overflow-wrap: anywhere; color: var(--text); font: 500 12px 'DM Mono', monospace; }
+.zip-file-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.zip-badge { display: inline-flex; padding: 4px 7px; border-radius: 5px; font: 500 9px 'DM Mono', monospace; white-space: nowrap; }
+.zip-badge-error { background: rgba(220,80,80,.12); color: #d65a5a; }
+.zip-badge-warning { background: rgba(215,155,55,.13); color: #b98225; }
+.zip-badge-info, .zip-badge-neutral { background: var(--surface-soft); color: var(--text-light); }
+.zip-badge-ok { background: rgba(55,160,110,.12); color: #38966b; }
+.zip-issue-list { display: grid; gap: 7px; padding: 0 12px 12px; }
+.zip-issue-card > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; cursor: pointer; color: var(--text); font-size: 11px; list-style: none; }
+.zip-issue-body { padding: 0 13px 13px; color: var(--text-light); font-size: 11px; line-height: 1.6; }
+.zip-issue-body p { margin: 7px 0 10px; }
+.zip-issue-selector { color: var(--text); font: 11px 'DM Mono', monospace; }
+.zip-fix-options { padding: 12px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-soft); }
+.zip-fix-options > strong { color: var(--text); font-size: 11px; }
+.zip-fix-options > p, .zip-clean-message, .zip-preserve-note { margin: 5px 0 10px; color: var(--text-light); font-size: 10px; line-height: 1.6; }
+.zip-fix-option { display: flex; align-items: flex-start; gap: 9px; padding: 8px; margin-top: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; }
+.zip-fix-option input { margin-top: 3px; accent-color: var(--accent, #6366f1); }
+.zip-fix-option code { overflow-wrap: anywhere; color: var(--text); font: 10px/1.6 'DM Mono', monospace; }
+.zip-preserve-note { margin: 13px 0 0; }
+@media (max-width: 700px) { .zip-upload-card { grid-template-columns: 1fr; } .zip-upload-actions button { flex: 1; } .zip-files-heading { flex-direction: column; } .zip-files-actions { width: 100%; } .zip-files-actions button { flex: 1; } .zip-file-summary { align-items: flex-start; flex-direction: column; } .zip-file-badges { justify-content: flex-start; } }
