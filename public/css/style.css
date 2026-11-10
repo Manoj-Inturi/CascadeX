@@ -1784,3 +1784,126 @@ button:disabled {
 [data-theme="dark"] .token-function {
     color: #98C0C5;
 }
+
+
+/* Phase 3 fix assistant */
+.fix-choice-panel {
+    margin-top: 18px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+}
+.fix-choice-heading {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text);
+    font-size: 0.9rem;
+}
+.fix-choice-hint,
+.fix-generator-toolbar p,
+.generated-css-heading p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.6;
+}
+.fix-choice-options {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+}
+.fix-choice-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+.fix-choice-option:has(input:checked) {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+.fix-choice-option input {
+    margin-top: 3px;
+    accent-color: var(--accent);
+}
+.fix-choice-option code {
+    color: var(--text);
+    font-size: 0.8rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.fix-generator-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 28px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+}
+.fix-generator-toolbar strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text);
+}
+.selected-fix-count {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+#generate-css:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.generated-css-panel {
+    margin-top: 18px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+}
+.generated-css-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.generated-css-heading h3 {
+    margin: 4px 0 6px;
+    color: var(--text);
+}
+.generated-css-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.generated-css-output {
+    display: block;
+    width: 100%;
+    min-height: 320px;
+    resize: vertical;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-soft);
+    color: var(--text);
+    font-family: "DM Mono", monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    tab-size: 4;
+}
+@media (max-width: 640px) {
+    .fix-generator-toolbar { align-items: flex-start; }
+    .fix-generator-toolbar #generate-css { width: 100%; }
+    .generated-css-actions { width: 100%; }
+    .generated-css-actions button { flex: 1; }
+}
